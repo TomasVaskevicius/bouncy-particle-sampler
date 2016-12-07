@@ -1,5 +1,7 @@
 #pragma once
 
+#include "bouncy_particle_sampler/bps_utils.h"
+#include "bouncy_particle_sampler/newtonian_bounce_operator.h"
 #include "poisson_process/homogeneous_poisson_process.h"
 #include "poisson_process/nhpp_by_approximating_quantile.h"
 
@@ -8,23 +10,8 @@
 
 // Todo:
 //
-// 1) Refactor the bounce operator.
+// 1) Refactor the flow function (linear flow in this case).
 // 2) Refactor the Poisson Process factory.
-
-namespace {
-
-// Helper for creating pointers to BpsState.
-template<typename T, int Dim>
-std::unique_ptr<bps::McmcState<T, Dim>> generateMcmcState(
-    Eigen::Matrix<T, Dim, 1> position,
-    Eigen::Matrix<T, Dim, 1> velocity,
-    T eventTime) {
-
-  return std::unique_ptr<bps::McmcState<T, Dim>>(
-      new bps::BpsState<T, Dim>(position, velocity, eventTime));
-}
-
-}
 
 namespace bps {
 
@@ -35,6 +22,8 @@ BasicBps<T, Dim>::BasicBps(
         energyGradient)
   : refreshRate_(refreshRate),
     energyGradient_(energyGradient),
+    bounceOperator_(std::move(std::unique_ptr<BounceOperator<T, Dim>>(
+        new NewtonianBounceOperator<T, Dim>()))),
     Mcmc<T, Dim>(std::move(this->getInitialState())) {
 }
 
@@ -56,15 +45,17 @@ std::unique_ptr<McmcState<T, Dim>> BasicBps<T, Dim>::generateNextState() const {
         *lastState, refreshmentInterarrivalTime);
     auto newVelocity = this->getRefreshedVelocity();
     T newEventTime = lastEventTime + refreshmentInterarrivalTime;
-    return generateMcmcState(newPosition, newVelocity, newEventTime);
+    return BpsUtils<T, Dim>::createBpsMcmcState(
+        newPosition, newVelocity, newEventTime);
   } else {
     // Simulate bounce event.
     auto newPosition = this->calculateNewPosition(
         *lastState, bounceInterarrivalTime);
-    auto newVelocity = this->calculateVelocityAfterBounce(
-        newPosition, lastState->getVelocity());
     T newEventTime = lastEventTime + bounceInterarrivalTime;
-    return generateMcmcState(newPosition, newVelocity, newEventTime);
+    BpsState<T, Dim> bpsState(
+        newPosition, lastState->getVelocity(), newEventTime);
+    return bounceOperator_->getStateAfterBounce(
+        bpsState, this->energyGradient_);
   }
 }
 
@@ -73,7 +64,7 @@ std::unique_ptr<McmcState<T, Dim>> BasicBps<T, Dim>::getInitialState() const {
   Eigen::Matrix<T, Dim, 1> location = this->getRefreshedVelocity();
   Eigen::Matrix<T, Dim, 1> velocity = this->getRefreshedVelocity();
 
-  return generateMcmcState(location, velocity, (T) 0.0);
+  return BpsUtils<T, Dim>::createBpsMcmcState(location, velocity, (T) 0.0);
 }
 
 
@@ -113,18 +104,6 @@ Eigen::Matrix<T, Dim, 1> BasicBps<T, Dim>::calculateNewPosition(
   auto lastPosition = state.getLocation();
   auto velocity = state.getVelocity();
   return lastPosition + velocity * time;
-}
-
-template<typename T, int Dim>
-Eigen::Matrix<T, Dim, 1> BasicBps<T, Dim>::calculateVelocityAfterBounce(
-    Eigen::Matrix<T, Dim, 1> position,
-    Eigen::Matrix<T, Dim, 1> velocity) const {
-
-  auto energyGradientAtPosition = energyGradient_(position);
-  return velocity
-         - energyGradientAtPosition
-         * 2 * velocity.dot(energyGradientAtPosition)
-         / energyGradientAtPosition.squaredNorm();
 }
 
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/mcmc.h"
+#include "bouncy_particle_sampler/bounce_operator.h"
 #include "bouncy_particle_sampler/bps_state.h"
 #include "poisson_process/poisson_process.h"
 
@@ -52,16 +53,13 @@ class BasicBps : public Mcmc<FloatingPointType, Dimensionality> {
       const BpsState<FloatingPointType, Dimensionality>& state,
       FloatingPointType time) const;
 
-  Eigen::Matrix<FloatingPointType, Dimensionality, 1>
-      calculateVelocityAfterBounce(
-          Eigen::Matrix<FloatingPointType, Dimensionality, 1> position,
-          Eigen::Matrix<FloatingPointType, Dimensionality, 1> velocity) const;
-
   const FloatingPointType refreshRate_;
 
   const std::function<Eigen::Matrix<FloatingPointType, Dimensionality, 1>(
       Eigen::Matrix<FloatingPointType, Dimensionality, 1>)> energyGradient_;
 
+  const std::unique_ptr<BounceOperator<FloatingPointType, Dimensionality>>
+      bounceOperator_;
 };
 
 }
