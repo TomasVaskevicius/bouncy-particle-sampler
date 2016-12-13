@@ -72,6 +72,11 @@ class Mcmc : public RandomNumberSampler<FloatingPointType, Dimensionality> {
   Eigen::Matrix<FloatingPointType, Dimensionality, 1>
       getNextSample() override final;
 
+  /**
+   * Resets the algorithm by regenerating the initial state at random.
+   */
+  void reset();
+
  protected:
 
   // Constructor to be called by derived classes for initializing mcmc state.
