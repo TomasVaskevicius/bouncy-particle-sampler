@@ -38,6 +38,54 @@ class BpsUtils {
           Eigen::Matrix<FloatingPointType, Dimensionality, 1> velocity,
           FloatingPointType eventTime);
 
+  /**
+   * Returns the event time difference between two BpsState objects.
+   */
+  static FloatingPointType getTimeDifferenceBetweenBpsMcmcStates(
+      std::shared_ptr<McmcState<FloatingPointType, Dimensionality>> oldState,
+      std::shared_ptr<McmcState<FloatingPointType, Dimensionality>> newState);
+
+  /**
+   * Returns the path length of the BPS algorithm output samples.
+   */
+  static FloatingPointType getTotalPathLength(
+    const std::vector<std::shared_ptr<
+        McmcState<FloatingPointType, Dimensionality>>>& samples);
+
+
+  /**
+   * Extracts the BPS particle location from McmcState pointer.
+   */
+  static Eigen::Matrix<FloatingPointType, Dimensionality, 1>
+      getLocationFromMcmcState(const std::shared_ptr<bps::McmcState<
+          FloatingPointType, Dimensionality>>& state);
+
+  /**
+   * Extracts the BPS particle velocity from McmcState pointer.
+   */
+  static Eigen::Matrix<FloatingPointType, Dimensionality, 1>
+      getVelocityFromMcmcState(const std::shared_ptr<bps::McmcState<
+          FloatingPointType, Dimensionality>>& state);
+
+  /**
+   * Extracts the BPS particle event time from McmcState pointer.
+   */
+  static FloatingPointType
+      getEventTimeFromMcmcState(const std::shared_ptr<bps::McmcState<
+          FloatingPointType, Dimensionality>>& state);
+
+  /**
+   * Integrates a function along a piecewise linear segment determined by
+   * two BPS states.
+   */
+  static FloatingPointType integrateAlongPiecewiseLinearSegment(
+      const std::shared_ptr<McmcState<FloatingPointType, Dimensionality>>&
+          leftEndpoint,
+      const std::shared_ptr<McmcState<FloatingPointType, Dimensionality>>&
+          rightEndpoint,
+      const std::function<FloatingPointType(
+          Eigen::Matrix<FloatingPointType, Dimensionality, 1>)>& function);
+
 };
 
 }
