@@ -60,6 +60,46 @@ std::unique_ptr<McmcState<T, Dim>> BasicBps<T, Dim>::generateNextState() const {
 }
 
 template<typename T, int Dim>
+std::vector<std::shared_ptr<McmcState<T, Dim>>> BasicBps<T, Dim>
+    ::getBatchOfMcmcStatesByTrajectoryLength(T requestedLength) {
+
+  T generatedLength = (T) 0.0;
+  std::vector<std::shared_ptr<McmcState<T, Dim>>> batch;
+  batch.push_back(this->lastState_);
+  std::shared_ptr<McmcState<T, Dim>> lastState = this->lastState_;
+  while (generatedLength < requestedLength) {
+    this->lastState_ = this->generateNextState();
+    batch.push_back(this->lastState_);
+
+    T timeDifference = BpsUtils<T, Dim>::getTimeDifferenceBetweenBpsMcmcStates(
+        lastState, this->lastState_);
+    generatedLength += timeDifference;
+
+    lastState = this->lastState_;
+  }
+
+  return batch;
+}
+
+template<typename T, int Dim>
+T BasicBps<T, Dim>::getRefreshRate() {
+  return this->refreshRate_;
+}
+
+template<typename T, int Dim>
+T BasicBps<T, Dim>::evaluateIntensityAtState(const BpsState<T, Dim>& state) {
+  auto position = state.getLocation();
+  auto velocity = state.getVelocity();
+  T intensity = velocity.dot(this->energyGradient_(position));
+  return intensity;
+}
+
+template<typename T, int Dim>
+const BounceOperator<T, Dim>& BasicBps<T, Dim>::getBounceOperator() {
+  return this->bounceOperator_;
+}
+
+template<typename T, int Dim>
 std::unique_ptr<McmcState<T, Dim>> BasicBps<T, Dim>::getInitialState() const {
   Eigen::Matrix<T, Dim, 1> location = this->getRefreshedVelocity();
   Eigen::Matrix<T, Dim, 1> velocity = this->getRefreshedVelocity();
