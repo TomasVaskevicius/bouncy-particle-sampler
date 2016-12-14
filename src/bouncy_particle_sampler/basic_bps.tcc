@@ -87,6 +87,11 @@ T BasicBps<T, Dim>::getRefreshRate() {
 }
 
 template<typename T, int Dim>
+void BasicBps<T, Dim>::setRefreshRate(T refreshRate) {
+  this->refreshRate_ = refreshRate;
+}
+
+template<typename T, int Dim>
 T BasicBps<T, Dim>::evaluateIntensityAtState(const BpsState<T, Dim>& state) {
   auto position = state.getLocation();
   auto velocity = state.getVelocity();

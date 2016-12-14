@@ -49,6 +49,11 @@ class BasicBps : public Mcmc<FloatingPointType, Dimensionality> {
   FloatingPointType getRefreshRate();
 
   /**
+   * Changes the refresh rate.
+   */
+  void setRefreshRate(FloatingPointType refreshRate);
+
+  /**
    * Evaluates the Poisson process intensity function at the given state.
    */
   FloatingPointType evaluateIntensityAtState(
@@ -77,7 +82,7 @@ class BasicBps : public Mcmc<FloatingPointType, Dimensionality> {
       const BpsState<FloatingPointType, Dimensionality>& state,
       FloatingPointType time) const;
 
-  const FloatingPointType refreshRate_;
+  FloatingPointType refreshRate_;
 
   const std::function<Eigen::Matrix<FloatingPointType, Dimensionality, 1>(
       Eigen::Matrix<FloatingPointType, Dimensionality, 1>)> energyGradient_;
