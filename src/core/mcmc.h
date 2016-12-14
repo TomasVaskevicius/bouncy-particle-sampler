@@ -73,6 +73,12 @@ class Mcmc : public RandomNumberSampler<FloatingPointType, Dimensionality> {
       getNextSample() override final;
 
   /**
+   * Sets the current state of the algorithm to the one given by the user.
+   */
+  void setCurrentState(
+      std::shared_ptr<McmcState<FloatingPointType, Dimensionality>>& state);
+
+  /**
    * Resets the algorithm by regenerating the initial state at random.
    */
   void reset();

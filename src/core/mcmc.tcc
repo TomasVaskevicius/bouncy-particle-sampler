@@ -21,6 +21,11 @@ std::vector<std::shared_ptr<McmcState<T, Dim>>>
 }
 
 template<typename T, int Dim>
+void Mcmc<T, Dim>::setCurrentState(std::shared_ptr<McmcState<T, Dim>>& state) {
+  this->lastState_ = state;
+}
+
+template<typename T, int Dim>
 void Mcmc<T, Dim>::reset() {
   this->lastState_ = this->getInitialState();
 }
