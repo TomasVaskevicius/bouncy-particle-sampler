@@ -50,6 +50,8 @@ class Mcmc : public RandomNumberSampler<FloatingPointType, Dimensionality> {
 
  public:
 
+  Mcmc();
+
   virtual ~Mcmc() {}
 
   /**
@@ -82,12 +84,6 @@ class Mcmc : public RandomNumberSampler<FloatingPointType, Dimensionality> {
    * Resets the algorithm by regenerating the initial state at random.
    */
   void reset();
-
- protected:
-
-  // Constructor to be called by derived classes for initializing mcmc state.
-  Mcmc(std::unique_ptr<McmcState<FloatingPointType, Dimensionality>>
-      initialState);
 
   // Generates an initial state for starting this algorithm. Can
   // only be called once and should be called from the constructor.

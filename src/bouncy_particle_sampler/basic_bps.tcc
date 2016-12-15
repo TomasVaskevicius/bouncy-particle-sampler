@@ -2,6 +2,7 @@
 
 #include "bouncy_particle_sampler/bps_utils.h"
 #include "bouncy_particle_sampler/newtonian_bounce_operator.h"
+#include "core/mcmc.h"
 #include "poisson_process/homogeneous_poisson_process.h"
 #include "poisson_process/nhpp_by_approximating_quantile.h"
 
@@ -23,8 +24,9 @@ BasicBps<T, Dim>::BasicBps(
   : refreshRate_(refreshRate),
     energyGradient_(energyGradient),
     bounceOperator_(std::move(std::unique_ptr<BounceOperator<T, Dim>>(
-        new NewtonianBounceOperator<T, Dim>()))),
-    Mcmc<T, Dim>(std::move(this->getInitialState())) {
+        new NewtonianBounceOperator<T, Dim>()))) {
+
+  this->lastState_ = this->getInitialState();
 }
 
 template<typename T, int Dim>
@@ -121,6 +123,7 @@ Eigen::Matrix<T, Dim, 1> BasicBps<T, Dim>::getRefreshedVelocity() const {
   for (int i = 0; i < Dim; i++) {
     refreshedVelocity(i) = normal(const_cast<BasicBps<T, Dim>*>(this)->rng_);
   }
+
   return refreshedVelocity;
 }
 
