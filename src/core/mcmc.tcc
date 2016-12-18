@@ -13,9 +13,7 @@ Eigen::Matrix<T, Dim, 1> Mcmc<T, Dim>::getNextSample() {
 }
 
 template<typename T, int Dim>
-std::vector<std::shared_ptr<McmcState<T, Dim>>>
-    Mcmc<T, Dim>::getBatchOfMcmcStates(int batchSize) {
-
+typename Mcmc<T, Dim>::SampleOutput Mcmc<T, Dim>::getBatchOfMcmcStates(int batchSize) {
   std::vector<std::shared_ptr<McmcState<T, Dim>>> batch;
   for (int i = 0; i < batchSize; i++) {
     batch.push_back(this->lastState_);

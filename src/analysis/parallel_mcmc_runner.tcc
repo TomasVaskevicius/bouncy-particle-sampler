@@ -6,7 +6,7 @@ namespace bps {
 namespace analysis {
 
 template<typename T, int Dim>
-std::unique_ptr<std::vector<std::vector<std::shared_ptr<McmcState<T, Dim>>>>>
+std::unique_ptr<std::vector<typename Mcmc<T, Dim>::SampleOutput>>
     ParallelMcmcRunner<T, Dim>::generateBpsSamples(
         const std::function<std::unique_ptr<BasicBps<T, Dim>>(void)>&
           bpsFactory,

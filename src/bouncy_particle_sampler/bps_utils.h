@@ -49,9 +49,8 @@ class BpsUtils {
    * Returns the path length of the BPS algorithm output samples.
    */
   static FloatingPointType getTotalPathLength(
-    const std::vector<std::shared_ptr<
-        McmcState<FloatingPointType, Dimensionality>>>& samples);
-
+      const typename Mcmc<FloatingPointType, Dimensionality>::SampleOutput&
+          samples);
 
   /**
    * Extracts the BPS particle location from McmcState pointer.

@@ -40,7 +40,7 @@ class BasicBps : public Mcmc<FloatingPointType, Dimensionality> {
    * Returns a vector of samples such that the total trajectory length
    * is at least as long as the requested length.
    */
-  std::vector<std::shared_ptr<McmcState<FloatingPointType, Dimensionality>>>
+  typename Mcmc<FloatingPointType, Dimensionality>::SampleOutput
       getBatchOfMcmcStatesByTrajectoryLength(FloatingPointType requestedLength);
 
   /**

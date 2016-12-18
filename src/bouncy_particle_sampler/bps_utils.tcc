@@ -39,14 +39,14 @@ T BpsUtils<T, Dim>::getTimeDifferenceBetweenBpsMcmcStates(
 
 template<typename T, int Dim>
 T BpsUtils<T, Dim>::getTotalPathLength(
-    const std::vector<std::shared_ptr<McmcState<T, Dim>>>& samples) {
+    const typename Mcmc<T, Dim>::SampleOutput& samples) {
 
-  T totalLength = (T) 0.0;
-  for (int i = 1; i < samples.size(); i++) {
-    totalLength += BpsUtils<T, Dim>::getTimeDifferenceBetweenBpsMcmcStates(
-      samples[i-1], samples[i]);
-  }
-  return totalLength;
+  T initialTime = BpsUtils<T, Dim>::getEventTimeFromMcmcState(
+      samples[0]);
+  T lastTime = BpsUtils<T, Dim>::getEventTimeFromMcmcState(
+      samples[samples.size()-1]);
+
+  return lastTime - initialTime;
 }
 
 template<typename T, int Dim>

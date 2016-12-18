@@ -62,7 +62,7 @@ std::unique_ptr<McmcState<T, Dim>> BasicBps<T, Dim>::generateNextState() const {
 }
 
 template<typename T, int Dim>
-std::vector<std::shared_ptr<McmcState<T, Dim>>> BasicBps<T, Dim>
+typename Mcmc<T, Dim>::SampleOutput BasicBps<T, Dim>
     ::getBatchOfMcmcStatesByTrajectoryLength(T requestedLength) {
 
   T generatedLength = (T) 0.0;

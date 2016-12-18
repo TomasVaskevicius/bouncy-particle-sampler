@@ -30,12 +30,11 @@ class IntegratedAutocorrelationTime {
    *   The number of batches used to estimate the Markov Chains CLT variance.
    */
   static FloatingPointType calculateIntegratedAutocorrelationTime(
-      const std::vector<std::shared_ptr<
-                        McmcState<FloatingPointType, Dimensionality>>>&
-      samples,
+      const typename Mcmc<FloatingPointType, Dimensionality>::SampleOutput&
+        samples,
       const std::function<FloatingPointType(
                           Eigen::Matrix<FloatingPointType, Dimensionality, 1>)>&
-      function,
+        function,
       const int numberOfBatches = 100);
 
 };

@@ -49,7 +49,7 @@ T calculateVariance(const std::vector<T>& numbers) {
 template<typename T, int Dim>
 T estimateMarkovChainsCltVariance(
     int numberOfBatches,
-    const std::vector<std::shared_ptr<bps::McmcState<T, Dim>>>& samples,
+    const typename bps::Mcmc<T, Dim>::SampleOutput& samples,
     const std::function<T(Eigen::Matrix<T, Dim, 1>)>& function) {
 
   T totalPathLength = bps::BpsUtils<T, Dim>::getTotalPathLength(samples);
@@ -108,7 +108,7 @@ T estimateMarkovChainsCltVariance(
 // Estimate the real variance.
 template<typename T, int Dim>
 T estimateRealVariance(
-    const std::vector<std::shared_ptr<bps::McmcState<T, Dim>>>& samples,
+    const typename bps::Mcmc<T, Dim>::SampleOutput& samples,
     const std::function<T(Eigen::Matrix<T, Dim, 1>)>& function) {
 
   auto meansVector = bps::BpsExpectationEstimators<T, Dim>
@@ -134,7 +134,7 @@ namespace bps {
 
 template<typename T, int Dim>
 T IntegratedAutocorrelationTime<T, Dim>::calculateIntegratedAutocorrelationTime(
-    const std::vector<std::shared_ptr<McmcState<T, Dim>>>& samples,
+    const typename Mcmc<T, Dim>::SampleOutput& samples,
     const std::function<T(Eigen::Matrix<T, Dim, 1>)>& function,
     const int numberOfBatches) {
 
