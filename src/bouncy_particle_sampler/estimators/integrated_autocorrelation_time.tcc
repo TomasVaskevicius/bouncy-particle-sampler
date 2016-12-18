@@ -136,7 +136,7 @@ template<typename T, int Dim>
 T IntegratedAutocorrelationTime<T, Dim>::calculateIntegratedAutocorrelationTime(
     const typename Mcmc<T, Dim>::SampleOutput& samples,
     const typename Mcmc<T, Dim>::RealFunctionOnSamples& function,
-    const int numberOfBatches) {
+    const int& numberOfBatches) {
 
   T cltVariance = estimateMarkovChainsCltVariance<T, Dim>(
       numberOfBatches, samples, function);

@@ -34,7 +34,7 @@ class IntegratedAutocorrelationTime {
         samples,
       const typename Mcmc<FloatingPointType, Dimensionality>
         ::RealFunctionOnSamples& function,
-      const int numberOfBatches = 100);
+      const int& numberOfBatches = 100);
 
 };
 
