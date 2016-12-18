@@ -2,6 +2,7 @@
 #include <iostream>
 #include "gsl_wrappers/wrappers_utils.h"
 
+#include <gsl/gsl_errno.h>
 #include <gsl/gsl_integration.h>
 
 namespace {
@@ -26,6 +27,8 @@ namespace bps {
 template<typename T>
 T GslIntegrationWrappers<T>::integrate(
     const std::function<T(T)>& function, T a, T b) {
+
+  gsl_set_error_handler_off();
 
   gsl_function gsl_func = bps::GslWrappersUtils<T>
       ::convertStdFunctionToGslFunction(function);
