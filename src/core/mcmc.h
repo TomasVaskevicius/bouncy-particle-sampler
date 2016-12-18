@@ -54,6 +54,10 @@ class Mcmc : public RandomNumberSampler<FloatingPointType, Dimensionality> {
             McmcState<FloatingPointType, Dimensionality>>>
           SampleOutput;
 
+  typedef std::function<FloatingPointType(
+            Eigen::Matrix<FloatingPointType, Dimensionality, 1>)>
+          RealFunctionOnSamples;
+
   Mcmc();
 
   virtual ~Mcmc() {}

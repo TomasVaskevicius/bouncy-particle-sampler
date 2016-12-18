@@ -32,9 +32,8 @@ class IntegratedAutocorrelationTime {
   static FloatingPointType calculateIntegratedAutocorrelationTime(
       const typename Mcmc<FloatingPointType, Dimensionality>::SampleOutput&
         samples,
-      const std::function<FloatingPointType(
-                          Eigen::Matrix<FloatingPointType, Dimensionality, 1>)>&
-        function,
+      const typename Mcmc<FloatingPointType, Dimensionality>
+        ::RealFunctionOnSamples& function,
       const int numberOfBatches = 100);
 
 };

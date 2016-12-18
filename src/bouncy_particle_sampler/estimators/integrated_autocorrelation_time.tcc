@@ -50,7 +50,7 @@ template<typename T, int Dim>
 T estimateMarkovChainsCltVariance(
     int numberOfBatches,
     const typename bps::Mcmc<T, Dim>::SampleOutput& samples,
-    const std::function<T(Eigen::Matrix<T, Dim, 1>)>& function) {
+    const typename bps::Mcmc<T, Dim>::RealFunctionOnSamples& function) {
 
   T totalPathLength = bps::BpsUtils<T, Dim>::getTotalPathLength(samples);
   T batchLength = totalPathLength / (T) numberOfBatches;
@@ -109,7 +109,7 @@ T estimateMarkovChainsCltVariance(
 template<typename T, int Dim>
 T estimateRealVariance(
     const typename bps::Mcmc<T, Dim>::SampleOutput& samples,
-    const std::function<T(Eigen::Matrix<T, Dim, 1>)>& function) {
+    const typename bps::Mcmc<T, Dim>::RealFunctionOnSamples& function) {
 
   auto meansVector = bps::BpsExpectationEstimators<T, Dim>
       ::numericalIntegrationEstimator(samples, function);
@@ -135,12 +135,12 @@ namespace bps {
 template<typename T, int Dim>
 T IntegratedAutocorrelationTime<T, Dim>::calculateIntegratedAutocorrelationTime(
     const typename Mcmc<T, Dim>::SampleOutput& samples,
-    const std::function<T(Eigen::Matrix<T, Dim, 1>)>& function,
+    const typename Mcmc<T, Dim>::RealFunctionOnSamples& function,
     const int numberOfBatches) {
 
-  T cltVariance = estimateMarkovChainsCltVariance(
+  T cltVariance = estimateMarkovChainsCltVariance<T, Dim>(
       numberOfBatches, samples, function);
-  T realVariance = estimateRealVariance(samples, function);
+  T realVariance = estimateRealVariance<T, Dim>(samples, function);
 
   return cltVariance / realVariance;
 }

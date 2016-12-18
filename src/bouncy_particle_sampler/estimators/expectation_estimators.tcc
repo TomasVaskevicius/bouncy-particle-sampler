@@ -9,7 +9,7 @@ namespace bps {
 template<typename T, int Dim>
 std::vector<T> BpsExpectationEstimators<T, Dim>::numericalIntegrationEstimator(
     const typename Mcmc<T, Dim>::SampleOutput& samples,
-    const std::function<T(Eigen::Matrix<T, Dim, 1>)>& function) {
+    const typename Mcmc<T, Dim>::RealFunctionOnSamples& function) {
 
   std::vector<T> expectationEstimates;
 
