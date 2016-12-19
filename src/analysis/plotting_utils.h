@@ -2,6 +2,9 @@
 
 #include "core/mcmc.h"
 
+#include <string>
+#include <vector>
+
 #include <QApplication>
 #include <QMainWindow>
 
@@ -28,9 +31,25 @@ class PlottingUtils {
 
   /**
    * Plots the sample path of two dimensional BPS output.
+   *
+   * @param smapleRun
+   *   Output of the BPS algorithm.
    */
   void plotTwoDimensionalSamplePath(
     const typename Mcmc<FloatingPointType, 2>::SampleOutput& sampleRun);
+
+  /**
+   * This method generated box plots.
+   *
+   * @param data
+   *   A vector of data for each box.
+   * @param names
+   *   Names for each box. Size of this vector must be equal to the
+   *   size of data vector.
+   */
+  void plotBoxPlot(
+    const std::vector<std::vector<FloatingPointType>>& data,
+    const std::vector<std::string>& names);
 
  private:
 
