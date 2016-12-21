@@ -44,6 +44,7 @@ class OutputAnalysis {
       const typename Mcmc<FloatingPointType, Dimensionality>
         ::RealFunctionOnSamples& functionToEstimate,
       const ExpecatationEstimator& expectationEstimator);
+
   /**
    * For each given vector of sample outputs, calculates the integrated
    * autocorrelation time using the given estimator. IACT is calculated
@@ -77,8 +78,18 @@ class OutputAnalysis {
    *   A vector of average inter event times for each given sample run.
    */
   static std::vector<FloatingPointType>
-    calculateAverageIntereventTime(
-      const SampleOutputsVector& sampleRuns);
+    calculateAverageIntereventTime(const SampleOutputsVector& sampleRuns);
+
+  /**
+   * For each given sample run, returns a vector of event times.
+   *
+   * @param sampleRuns
+   *   A vector of sample runs of the BPS algorithm.
+   * @return
+   *   A vector of event times (in ascending order) for each sample run.
+   */
+  static std::vector<std::vector<FloatingPointType>>
+    getEventTimes(const SampleOutputsVector& sampleRuns);
 };
 
 }

@@ -69,6 +69,25 @@ std::vector<T> OutputAnalysis<T, Dim>::calculateAverageIntereventTime(
   return averageIntereventTimes;
 }
 
+template<typename T, int Dim>
+std::vector<std::vector<T>> OutputAnalysis<T, Dim>::getEventTimes(
+    const SampleOutputsVector& sampleRuns) {
+
+  std::vector<std::vector<T>> eventTimes;
+
+  for (int i = 0; i < sampleRuns.size(); i++) {
+    std::vector<T> eventTimesForIthRun;
+    for (const auto& sample: sampleRuns[i]) {
+      eventTimesForIthRun.push_back(
+        BpsUtils<T, Dim>::getEventTimeFromMcmcState(sample));
+    }
+    eventTimes.push_back(eventTimesForIthRun);
+  }
+
+  return eventTimes;
+
+}
+
 }
 }
 
