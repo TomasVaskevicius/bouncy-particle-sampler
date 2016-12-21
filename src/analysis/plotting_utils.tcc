@@ -49,7 +49,7 @@ void PlottingUtils<T>::plotTwoDimensionalSamplePath(
 
   this->qApplication_.exec();
 
-  customPlot->removePlottable(samplePath);
+  customPlot->clearPlottables();
 }
 
 template<typename T>
@@ -106,7 +106,49 @@ void PlottingUtils<T>::plotBoxPlot(
 
   this->qApplication_.exec();
 
-  customPlot->removePlottable(boxPlot);
+  customPlot->clearPlottables();
+}
+
+template<typename T>
+void PlottingUtils<T>::plotLineGraphs(
+    const std::vector<std::vector<T>>& xAxisValues,
+    const std::vector<std::vector<T>>& yAxisValues,
+    const std::string& xAxisName,
+    const std::string& yAxisName) {
+
+  QCustomPlot* customPlot = static_cast<QCustomPlot*>(
+      qMainWindow_->centralWidget());
+
+  for (int i = 0; i < xAxisValues.size(); i++) {
+    auto x = this->convertVectorToQVector(xAxisValues[i]);
+    auto y = this->convertVectorToQVector(yAxisValues[i]);
+    customPlot->addGraph();
+    customPlot->graph()->setData(x, y);
+  }
+
+  customPlot->xAxis->setLabel(QString::fromStdString(xAxisName));
+  customPlot->yAxis->setLabel(QString::fromStdString(yAxisName));
+
+  customPlot->rescaleAxes();
+  customPlot->replot();
+
+  this->qMainWindow_->setGeometry(100, 100, 500, 500);
+  this->qMainWindow_->show();
+
+  this->qApplication_.exec();
+
+  customPlot->clearPlottables();
+}
+
+template<typename T>
+QVector<double> PlottingUtils<T>::convertVectorToQVector(
+    const std::vector<T>& stdVector) {
+
+  QVector<double> qVector;
+  for (const auto& value : stdVector) {
+    qVector.push_back((double) value);
+  }
+  return qVector;
 }
 
 }

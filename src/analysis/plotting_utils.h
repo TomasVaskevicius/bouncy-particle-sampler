@@ -51,7 +51,31 @@ class PlottingUtils {
     const std::vector<std::vector<FloatingPointType>>& data,
     const std::vector<std::string>& names);
 
+  /**
+   * Plots given lines on the same graph. The given vectors must be of
+   * the same size and each pair of elemts (xAxisValues[i], yAxisValues[i])
+   * must also be of the same size.
+   *
+   * @param xAxisVector
+   *   For each line to plot, values for x axis.
+   * @param yAxisVector
+   *   For each line to plot, values for y axis.
+   * @param xAxisName
+   *   The x axis name.
+   * @param yAxisName
+   *   The y axis name.
+   */
+  void plotLineGraphs(
+    const std::vector<std::vector<FloatingPointType>>& xAxisValues,
+    const std::vector<std::vector<FloatingPointType>>& yAxisValues,
+    const std::string& xAxisName,
+    const std::string& yAxisName);
+
  private:
+
+  // Converts std::vector to a QVector<double>.
+  QVector<double> convertVectorToQVector(const std::vector<FloatingPointType>&
+      stdVector);
 
   QApplication qApplication_;
   std::unique_ptr<QMainWindow> qMainWindow_;
