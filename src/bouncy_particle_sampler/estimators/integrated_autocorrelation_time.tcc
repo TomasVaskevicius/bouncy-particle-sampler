@@ -13,21 +13,6 @@
 
 namespace {
 
-// Advances the BPS state by required time using linear flow.
-template<typename T, int Dim>
-std::shared_ptr<bps::McmcState<T, Dim>> advancePiecewiseLinearSegment(
-    const std::shared_ptr<bps::McmcState<T, Dim>>& state,
-    const T& requiredLength) {
-
-  auto location = bps::BpsUtils<T, Dim>::getLocationFromMcmcState(state);
-  auto velocity = bps::BpsUtils<T, Dim>::getVelocityFromMcmcState(state);
-  auto newLocation = location + velocity * requiredLength;
-  T newTime = bps::BpsUtils<T, Dim>::getEventTimeFromMcmcState(state)
-      + requiredLength;
-  return bps::BpsUtils<T, Dim>::createBpsMcmcState(
-      newLocation, velocity, newTime);
-}
-
 template<typename T>
 T calculateVariance(const std::vector<T>& numbers) {
   T mean = (T) 0.0;
@@ -88,7 +73,7 @@ T estimateMarkovChainsCltVariance(
         // Only a part of the current segment needs to be integrated for
         // the current batch.
         T remainingLength = batchLength - currentBatchLength;
-        auto midPoint = advancePiecewiseLinearSegment(
+        auto midPoint = bps::BpsUtils<T, Dim>::advanceBpsStateByLinearFlow(
             leftEndpoint, remainingLength);
         batchMean += bps::BpsUtils<T, Dim>
             ::integrateAlongPiecewiseLinearSegment(
