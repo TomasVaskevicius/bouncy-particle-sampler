@@ -85,6 +85,25 @@ class BpsUtils {
       const std::function<FloatingPointType(
           Eigen::Matrix<FloatingPointType, Dimensionality, 1>)>& function);
 
+  /**
+   * Advances the given BPS state using a linear flow by the required length.
+   */
+  static std::shared_ptr<McmcState<FloatingPointType, Dimensionality>>
+      advanceBpsStateByLinearFlow(
+          const std::shared_ptr<McmcState<FloatingPointType, Dimensionality>>&
+              state,
+          const FloatingPointType& requiredLength);
+
+  /**
+   * Given a BPS run, returns a vector of equally spaced points, where the
+   * distance between the two points is equal to jumpLength parameter.
+   */
+  static std::vector<Eigen::Matrix<FloatingPointType, Dimensionality, 1>>
+      getEquallySpacedPointsFromBpsRun(
+        const typename Mcmc<FloatingPointType, Dimensionality>::SampleOutput&
+          samples,
+        const FloatingPointType& jumpLength);
+
 };
 
 }

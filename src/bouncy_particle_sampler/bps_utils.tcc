@@ -91,4 +91,62 @@ T BpsUtils<T, Dim>::integrateAlongPiecewiseLinearSegment(
   return integral;
 }
 
+template<typename T, int Dim>
+std::shared_ptr<bps::McmcState<T, Dim>> BpsUtils<T, Dim>
+    ::advanceBpsStateByLinearFlow(
+        const std::shared_ptr<bps::McmcState<T, Dim>>& state,
+        const T& requiredLength) {
+
+  auto location = bps::BpsUtils<T, Dim>::getLocationFromMcmcState(state);
+  auto velocity = bps::BpsUtils<T, Dim>::getVelocityFromMcmcState(state);
+  auto newLocation = location + velocity * requiredLength;
+  T newTime = bps::BpsUtils<T, Dim>::getEventTimeFromMcmcState(state)
+      + requiredLength;
+  return bps::BpsUtils<T, Dim>::createBpsMcmcState(
+      newLocation, velocity, newTime);
+}
+
+template<typename T, int Dim>
+std::vector<Eigen::Matrix<T, Dim, 1>> BpsUtils<T, Dim>
+    ::getEquallySpacedPointsFromBpsRun(
+      const typename Mcmc<T, Dim>::SampleOutput& samples,
+      const T& jumpLength) {
+
+  std::vector<Eigen::Matrix<T, Dim, 1>> equallySpacedPoints;
+
+  auto leftEndpoint = samples[0];
+  auto rightEndpoint = samples[1];
+  int nextPiecewiseSegmentRightIndex = 2;
+
+  T remainderUntilNextPoint = 0;
+  // This loop will break once we run out of bps samples.
+  while (true) {
+    if (remainderUntilNextPoint == 0) {
+      equallySpacedPoints.push_back(leftEndpoint->getVectorRepresentedByState());
+      remainderUntilNextPoint = jumpLength;
+    }
+    if (BpsUtils<T, Dim>::getTimeDifferenceBetweenBpsMcmcStates(
+        leftEndpoint, rightEndpoint) >= remainderUntilNextPoint) {
+
+      // We can get the next point from inbetween the two
+      // current bps states (leftEndpoint and rightEndpoint).
+      leftEndpoint = BpsUtils<T, Dim>::advanceBpsStateByLinearFlow(
+          leftEndpoint, remainderUntilNextPoint);
+      remainderUntilNextPoint = 0.0;
+    } else if(nextPiecewiseSegmentRightIndex < samples.size()) {
+      // We need to take the next bps segment and such segment exists.
+      remainderUntilNextPoint -= BpsUtils<T, Dim>
+          ::getTimeDifferenceBetweenBpsMcmcStates(leftEndpoint, rightEndpoint);
+      leftEndpoint = rightEndpoint;
+      rightEndpoint = samples[nextPiecewiseSegmentRightIndex];
+      nextPiecewiseSegmentRightIndex++;
+    } else {
+      // We need to take the next bps segment, but we ran out of samples.
+      break;
+    }
+  }
+
+  return equallySpacedPoints;
+}
+
 }
