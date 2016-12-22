@@ -81,6 +81,35 @@ class OutputAnalysis {
     calculateAverageIntereventTime(const SampleOutputsVector& sampleRuns);
 
   /**
+   * Calculates the autocorrelation statistics for each of the sample runs.
+   *
+   * @param sampleRuns
+   *   A vector of sample runs of the BPS algorithm.
+   * @param functionToEstimate
+   *   A function which respect to which the expectation needs to be calculated.
+   * @param numberOfDatapoints
+   *   Number of equally spaced lags.
+   * @param expectationEstimator
+   *   An estimator which should be used for calculating expectations.
+   * @param lagUpperbound
+   *   The lags will be calculated in the interval [0, lagUpperbound].
+   * @param lagStepsize
+   *   Specifies the stepsize for lags.
+   * @return
+   *   For each sample runs, return estimates of the autocorrelation
+   *   function at equally spaced lags (number of datapoints is specified by
+   *   parameter numberOfDatapoints).
+   */
+  static std::vector<std::vector<FloatingPointType>>
+    calculateAutocorrelationFunction(
+       const SampleOutputsVector& sampleRuns,
+       const typename Mcmc<FloatingPointType, Dimensionality>
+         ::RealFunctionOnSamples& functionToEstimate,
+       const ExpecatationEstimator& expectationEstimator,
+       const int& lagUpperbound,
+       const int& lagStepSize);
+
+  /**
    * For each given sample run, returns a vector of event times.
    *
    * @param sampleRuns
@@ -90,10 +119,53 @@ class OutputAnalysis {
    */
   static std::vector<std::vector<FloatingPointType>>
     getEventTimes(const SampleOutputsVector& sampleRuns);
+
+  /**
+   * Estimates the mean from a vector of sample runs.
+   * The mean is estimated separately over separate runs and then the average
+   * is taken.
+   *
+   * @param sampleRuns
+   *   A vector of sample runs of the BPS algorithm.
+   * @param functinoToEstimate
+   *   A function which will be aplied to BPS samples.
+   * @param expectationEstimator
+   *   An estimator used for expectation calculations.
+   * @return
+   *   An estimate of the mean.
+   */
+  static FloatingPointType estimateMeanFromSampleRuns(
+       const SampleOutputsVector& sampleRuns,
+       const typename Mcmc<FloatingPointType, Dimensionality>
+         ::RealFunctionOnSamples& functionToEstimate,
+       const ExpecatationEstimator& expectationEstimator);
+
+  /**
+   * Estimates the variance from a vector of sample runs.
+   * The variance is estimated separately over separate runs and then the
+   * average is taken.
+   *
+   * @param sampleRuns
+   *   A vector of sample runs of the BPS algorithm.
+   * @param functinoToEstimate
+   *   A function which will be aplied to BPS samples.
+   * @param expectationEstimator
+   *   An estimator used for expectation calculations.
+   * @param meanEstimate
+   *   A mean estimate (can be obtained from estimateMeanFromSampleRuns()).
+   * @return
+   *   An estimate of the variance.
+   */
+  static FloatingPointType estimateVarianceFromSampleRuns(
+       const SampleOutputsVector& sampleRuns,
+       const typename Mcmc<FloatingPointType, Dimensionality>
+         ::RealFunctionOnSamples& functionToEstimate,
+       const ExpecatationEstimator& expectationEstimator,
+       const FloatingPointType& meanEstimate);
+
 };
 
 }
 }
 
 #include "analysis/output_analysis.tcc"
-
