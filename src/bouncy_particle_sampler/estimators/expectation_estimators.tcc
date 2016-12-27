@@ -12,6 +12,7 @@ std::vector<T> BpsExpectationEstimators<T, Dim>::numericalIntegrationEstimator(
     const typename Mcmc<T, Dim>::RealFunctionOnSamples& function) {
 
   std::vector<T> expectationEstimates;
+  expectationEstimates.push_back(0.0);
 
   T totalTime = (T) 0.0;
   T totalIntegral = (T) 0.0;
