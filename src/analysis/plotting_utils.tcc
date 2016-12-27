@@ -3,6 +3,27 @@
 #include "gsl_wrappers/statistics_wrappers.h"
 
 #include <qcustomplot.h>
+#include <QDir>
+
+namespace {
+
+void createRequiredDirectories(const QString& filePath) {
+  QFileInfo fileInfo(filePath);
+  QDir fileDir = fileInfo.dir();
+  QDir currentDir;
+  currentDir.mkpath(fileDir.absolutePath());
+}
+
+template<typename T>
+QVector<double> convertVectorToQVector(const std::vector<T>& stdVector) {
+  QVector<double> qVector;
+  for (const auto& value : stdVector) {
+    qVector.push_back((double) value);
+  }
+  return qVector;
+}
+
+}
 
 namespace bps {
 namespace analysis {
@@ -15,17 +36,16 @@ PlottingUtils<T>::PlottingUtils()
 template<typename T>
 PlottingUtils<T>::PlottingUtils(int& argc, char* argv[])
     : qApplication_(argc, argv),
-      qMainWindow_(new QMainWindow()){
-
-  qMainWindow_->setCentralWidget(new QCustomPlot());
+      qMainWindow_(new QMainWindow()) {
 }
 
 template<typename T>
 void PlottingUtils<T>::plotTwoDimensionalSamplePath(
-    const typename Mcmc<T, 2>::SampleOutput& sampleRun) {
+    const typename Mcmc<T, 2>::SampleOutput& sampleRun,
+    const std::string& fileName) {
 
-  QCustomPlot* customPlot = static_cast<QCustomPlot*>(
-      qMainWindow_->centralWidget());
+  QCustomPlot* customPlot = new QCustomPlot();
+  this->qMainWindow_->setCentralWidget(customPlot);
 
   QVector<double> x, y;
 
@@ -44,21 +64,17 @@ void PlottingUtils<T>::plotTwoDimensionalSamplePath(
   customPlot->yAxis->setScaleRatio(customPlot->xAxis, 1.0);
   customPlot->replot();
 
-  this->qMainWindow_->setGeometry(100, 100, 500, 500);
-  this->qMainWindow_->show();
-
-  this->qApplication_.exec();
-
-  customPlot->clearPlottables();
+  this->handleImageOutput(fileName);
 }
 
 template<typename T>
 void PlottingUtils<T>::plotBoxPlot(
     const std::vector<std::vector<T>>& data,
-    const std::vector<std::string>& names) {
+    const std::vector<std::string>& names,
+    const std::string& fileName) {
 
-  QCustomPlot* customPlot = static_cast<QCustomPlot*>(
-      qMainWindow_->centralWidget());
+  QCustomPlot* customPlot = new QCustomPlot();
+  this->qMainWindow_->setCentralWidget(customPlot);
 
   QCPStatisticalBox* boxPlot = new QCPStatisticalBox(
       customPlot->xAxis, customPlot->yAxis);
@@ -101,12 +117,7 @@ void PlottingUtils<T>::plotBoxPlot(
 
   customPlot->replot();
 
-  this->qMainWindow_->setGeometry(100, 100, 500, 500);
-  this->qMainWindow_->show();
-
-  this->qApplication_.exec();
-
-  customPlot->clearPlottables();
+  this->handleImageOutput(fileName);
 }
 
 template<typename T>
@@ -114,14 +125,15 @@ void PlottingUtils<T>::plotLineGraphs(
     const std::vector<std::vector<T>>& xAxisValues,
     const std::vector<std::vector<T>>& yAxisValues,
     const std::string& xAxisName,
-    const std::string& yAxisName) {
+    const std::string& yAxisName,
+    const std::string& fileName) {
 
-  QCustomPlot* customPlot = static_cast<QCustomPlot*>(
-      qMainWindow_->centralWidget());
+  QCustomPlot* customPlot = new QCustomPlot();
+  this->qMainWindow_->setCentralWidget(customPlot);
 
   for (int i = 0; i < xAxisValues.size(); i++) {
-    auto x = this->convertVectorToQVector(xAxisValues[i]);
-    auto y = this->convertVectorToQVector(yAxisValues[i]);
+    auto x = convertVectorToQVector(xAxisValues[i]);
+    auto y = convertVectorToQVector(yAxisValues[i]);
     customPlot->addGraph();
     customPlot->graph()->setData(x, y);
   }
@@ -132,23 +144,27 @@ void PlottingUtils<T>::plotLineGraphs(
   customPlot->rescaleAxes();
   customPlot->replot();
 
-  this->qMainWindow_->setGeometry(100, 100, 500, 500);
-  this->qMainWindow_->show();
-
-  this->qApplication_.exec();
-
-  customPlot->clearPlottables();
+  this->handleImageOutput(fileName);
 }
 
 template<typename T>
-QVector<double> PlottingUtils<T>::convertVectorToQVector(
-    const std::vector<T>& stdVector) {
+void PlottingUtils<T>::showImageOnScreen() {
+  this->qMainWindow_->setGeometry(100, 100, 500, 500);
+  this->qMainWindow_->show();
+  this->qApplication_.exec();
+}
 
-  QVector<double> qVector;
-  for (const auto& value : stdVector) {
-    qVector.push_back((double) value);
+template<typename T>
+void PlottingUtils<T>::handleImageOutput(const std::string& fileName) {
+  if (fileName == "") {
+    this->showImageOnScreen();
+  } else {
+    QString filePath = QString::fromStdString(fileName + ".png");
+    createRequiredDirectories(filePath);
+    QCustomPlot* customPlot = static_cast<QCustomPlot*>(
+      this->qMainWindow_->centralWidget());
+    customPlot->savePng(filePath, 800, 800);
   }
-  return qVector;
 }
 
 }

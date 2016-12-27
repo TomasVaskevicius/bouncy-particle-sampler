@@ -34,9 +34,14 @@ class PlottingUtils {
    *
    * @param smapleRun
    *   Output of the BPS algorithm.
+   * @param fileName
+   *   The name of output image to save.
+   *   If not set, will output the image on the screen.
+   *
    */
   void plotTwoDimensionalSamplePath(
-    const typename Mcmc<FloatingPointType, 2>::SampleOutput& sampleRun);
+    const typename Mcmc<FloatingPointType, 2>::SampleOutput& sampleRun,
+    const std::string& fileName = "");
 
   /**
    * This method generated box plots.
@@ -46,10 +51,14 @@ class PlottingUtils {
    * @param names
    *   Names for each box. Size of this vector must be equal to the
    *   size of data vector.
+   * @param fileName
+   *   The name of output image to save.
+   *   If not set, will output the image on the screen.
    */
   void plotBoxPlot(
     const std::vector<std::vector<FloatingPointType>>& data,
-    const std::vector<std::string>& names);
+    const std::vector<std::string>& names,
+    const std::string& fileName = "");
 
   /**
    * Plots given lines on the same graph. The given vectors must be of
@@ -64,18 +73,24 @@ class PlottingUtils {
    *   The x axis name.
    * @param yAxisName
    *   The y axis name.
+   * @param fileName
+   *   The name of output image to save.
+   *   If not set, will output the image on the screen.
    */
   void plotLineGraphs(
     const std::vector<std::vector<FloatingPointType>>& xAxisValues,
     const std::vector<std::vector<FloatingPointType>>& yAxisValues,
     const std::string& xAxisName,
-    const std::string& yAxisName);
+    const std::string& yAxisName,
+    const std::string& fileName = "");
 
  private:
 
-  // Converts std::vector to a QVector<double>.
-  QVector<double> convertVectorToQVector(const std::vector<FloatingPointType>&
-      stdVector);
+  // Shows the current plot on screen.
+  void showImageOnScreen();
+
+  // If fileName = "", outputs image on screen. Else, saves a .png image.
+  void handleImageOutput(const std::string& fileName);
 
   QApplication qApplication_;
   std::unique_ptr<QMainWindow> qMainWindow_;
