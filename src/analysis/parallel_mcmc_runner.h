@@ -19,6 +19,11 @@ class ParallelMcmcRunner {
 
  public:
 
+  typedef  std::function<
+             std::unique_ptr<BasicBps<FloatingPointType, Dimensionality>>
+             (void)>
+           BpsFactory;
+
    /**
     * Runs the given BPS algorithm a specified number of times in parallel
     * and returns the generated samples.
@@ -40,9 +45,7 @@ class ParallelMcmcRunner {
    static std::unique_ptr<std::vector<
             typename Mcmc<FloatingPointType, Dimensionality>::SampleOutput>>
      generateBpsSamples(
-       const std::function<
-           std::unique_ptr<BasicBps<FloatingPointType, Dimensionality>>
-           (void)>& bpsFactory,
+       const BpsFactory& bpsFactory,
        FloatingPointType requiredTrajectoryLengths,
        int numberOfRuns,
        int numberOfThreads = 8);
