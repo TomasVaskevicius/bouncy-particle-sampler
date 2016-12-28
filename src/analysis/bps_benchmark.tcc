@@ -149,6 +149,8 @@ void BpsBenchmark<T, Dim>::runBenchmark(
 
   this->outputEffectiveSampleSizesPerSecond(outputDir, iacts);
 
+  this->outputAverageIntereventTimes(outputDir);
+
   for (int i = 0; i < this->sampleOutputs_->size(); i++) {
     std::string outputDirForThisAlgorithm =
       outputDir + this->shortAlgorithmNames_[i] + "/";
@@ -200,6 +202,24 @@ void BpsBenchmark<T, Dim>::outputErrorsForSampleRuns(
 }
 
 template<typename T, int Dim>
+void BpsBenchmark<T, Dim>::outputAverageIntereventTimes(
+  const std::string& outputDir) {
+
+
+  std::vector<std::vector<T>> averageIntereventTimes;
+  for (int i = 0; i < this->sampleOutputs_->size(); i++) {
+    averageIntereventTimes.push_back(
+      OutputAnalysis<T, Dim>::calculateAverageIntereventTime(
+        *(this->sampleOutputs_->at(i))));
+  }
+
+  this->plottingUtils_.plotBoxPlot(
+    averageIntereventTimes,
+    this->shortAlgorithmNames_,
+    outputDir + "averageIntereventTimes");
+}
+
+template<typename T, int Dim>
 std::vector<std::vector<T>> BpsBenchmark<T, Dim>::outputIactBoxPlot(
   const std::string& outputDir,
   const ExpectationEstimator& expectationEstimator,
@@ -213,7 +233,7 @@ std::vector<std::vector<T>> BpsBenchmark<T, Dim>::outputIactBoxPlot(
         *sampleRuns,
         realFunctionOnSamples,
         expectationEstimator,
-        70));
+        numberOfBatches));
   }
 
   this->plottingUtils_.plotBoxPlot(

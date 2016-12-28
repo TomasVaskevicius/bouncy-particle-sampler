@@ -117,6 +117,10 @@ class BpsBenchmark {
     const ExpectationEstimator& expectationEstimator,
     const RealFunctionOnSamples& realFunctionOnSamples);
 
+  // Outputs average interevent times.
+  void outputAverageIntereventTimes(
+    const std::string &outputDir);
+
   // For each run (numberOfAlgorithms * numberOfRuns) returns the IACT.
   std::vector<std::vector<FloatingPointType>> outputIactBoxPlot(
     const std::string& outputDir,
