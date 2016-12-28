@@ -2,6 +2,8 @@
 
 #include "gsl_wrappers/statistics_wrappers.h"
 
+#include <algorithm>
+
 #include <qcustomplot.h>
 #include <QDir>
 
@@ -21,6 +23,23 @@ QVector<double> convertVectorToQVector(const std::vector<T>& stdVector) {
     qVector.push_back((double) value);
   }
   return qVector;
+}
+
+// We consider datapoints outliers if one of the following inequalities hold:
+// datapoint >= thirdQuartile * 1.5 or datapoint <= firstQuartile / 1.5
+template<typename T>
+QVector<double> getOutliers(
+  const std::vector<T>& data,
+  const double& firstQuartile,
+  const double& thirdQuartile) {
+
+  QVector<double> outliers;
+  for (const T& datapoint : data) {
+    if (datapoint >= thirdQuartile * 1.5 || datapoint <= firstQuartile / 1.5) {
+      outliers.push_back(datapoint);
+    }
+  }
+  return outliers;
 }
 
 }
@@ -93,7 +112,20 @@ void PlottingUtils<T>::plotBoxPlot(
     double min, firstQuartile, median, thirdQuartile, max;
     GslStatisticsWrappers<T>::calculateStatisticsForBoxPlots(
         data[i], min, firstQuartile, median, thirdQuartile, max);
-    boxPlot->addData(i, min, firstQuartile, median, thirdQuartile, max);
+    QVector<double> outliers = getOutliers(
+      data[i], firstQuartile, thirdQuartile);
+
+    double whiskerMax = std::min(thirdQuartile * 1.5, max);
+    double whiskerMin = std::max(firstQuartile / 1.5, min);
+
+    boxPlot->addData(
+      i,
+      whiskerMin,
+      firstQuartile,
+      median,
+      thirdQuartile,
+      whiskerMax,
+      outliers);
 
     // Update minimum and maximum values found so far.
     yAxisMinimum = (min < yAxisMinimum) ? min : yAxisMinimum;
@@ -101,7 +133,7 @@ void PlottingUtils<T>::plotBoxPlot(
   }
 
   // Add some margin above and below the boxes.
-  double boxPlotMargin = (yAxisMaximum - yAxisMinimum) / 8.0;
+  double boxPlotMargin = (yAxisMaximum - yAxisMinimum) / 15.0;
   yAxisMaximum += boxPlotMargin;
   yAxisMinimum = (yAxisMinimum <= 0.0 || yAxisMinimum - boxPlotMargin >= 0.0) ?
                   yAxisMinimum - boxPlotMargin : 0.0;
