@@ -37,9 +37,11 @@ void printTimeEstimateForGeneratingSamples(
   const int& numberOfRunsForEachAlgorithm,
   const int& numberOfCores) {
 
-  T trajectoriesFraction = 1000.0;
-  T timeEstimateInMilliseconds =
-    bps::analysis::AnalysisUtils::getExecutionTime(
+  T trajectoriesFraction = 10000.0;
+  T timeEstimateInMilliseconds = 0;
+
+  do {
+    timeEstimateInMilliseconds = bps::analysis::AnalysisUtils::getExecutionTime(
       [&] () -> void {
         for (int i = 0; i < bpsFactories.size(); i++) {
           bps::analysis::ParallelMcmcRunner<T, Dim>::generateBpsSamples(
@@ -48,8 +50,12 @@ void printTimeEstimateForGeneratingSamples(
             numberOfRunsForEachAlgorithm,
             numberOfCores);
          }
-      }) * trajectoriesFraction;
-
+      });
+    trajectoriesFraction /= 10.0;
+  } while (timeEstimateInMilliseconds <= 200 && trajectoriesFraction >= 10.0);
+  // Recover the trajectories fraction used for last estimate.
+  trajectoriesFraction *= 10.0;
+  timeEstimateInMilliseconds *= trajectoriesFraction;
 
   std::cout << "Estimated time for generatig samples is: ";
   if (timeEstimateInMilliseconds / 1000.0 / 3600.0 >= 1.0) {
@@ -59,7 +65,8 @@ void printTimeEstimateForGeneratingSamples(
     std::cout << hours << " h " << minutes << " m." << std::endl;
   } else if (timeEstimateInMilliseconds / 1000.0 / 60.0 >= 1.0) {
     int minutes = timeEstimateInMilliseconds / 1000.0 / 60.0;
-    int seconds = (int) timeEstimateInMilliseconds % 1000;
+    int seconds = (int) timeEstimateInMilliseconds % (1000 * 60);
+    seconds /= 1000;
     std::cout << minutes << " m " << seconds << " s." << std::endl;
   } else {
     std::cout << timeEstimateInMilliseconds / 1000.0 << " s." << std::endl;
