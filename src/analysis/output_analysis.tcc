@@ -112,7 +112,10 @@ std::vector<T> OutputAnalysis<T, Dim>::calculateIntegratedAutocorrelationTime(
                   iactEstimates.push_back(
                     IntegratedAutocorrelationTime<T, Dim>
                       ::calculateIntegratedAutocorrelationTime(
-                        sampleRun, functionToEstimate, numberOfBatches));
+                        sampleRun,
+                        functionToEstimate,
+                        expectationEstimator,
+                        numberOfBatches));
                 });
 
   return iactEstimates;

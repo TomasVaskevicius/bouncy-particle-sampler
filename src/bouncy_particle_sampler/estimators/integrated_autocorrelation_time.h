@@ -17,6 +17,12 @@ class IntegratedAutocorrelationTime {
 
  public:
 
+  typedef std::function<std::vector<FloatingPointType>(
+            const typename Mcmc<FloatingPointType, Dimensionality>::SampleOutput&,
+            const typename Mcmc<FloatingPointType, Dimensionality>
+              ::RealFunctionOnSamples&)>
+          ExpectationEstimator;
+
   /**
    * Calculates the IACT.
    *
@@ -26,6 +32,8 @@ class IntegratedAutocorrelationTime {
    *   When calculating means, we will calculate the expectation of this
    *   function with respect to the invariant distribution which is the target
    *   of bps samples.
+   * @param expectationEstimator
+   *   An expectation estimator which will be used to estimate means.
    * @param numberOfBatches
    *   The number of batches used to estimate the Markov Chains CLT variance.
    */
@@ -34,6 +42,7 @@ class IntegratedAutocorrelationTime {
         samples,
       const typename Mcmc<FloatingPointType, Dimensionality>
         ::RealFunctionOnSamples& function,
+      const ExpectationEstimator& expectationEstimator,
       const int& numberOfBatches = 100);
 
 };
