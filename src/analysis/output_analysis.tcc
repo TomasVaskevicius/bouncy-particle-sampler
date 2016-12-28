@@ -119,6 +119,25 @@ std::vector<T> OutputAnalysis<T, Dim>::calculateIntegratedAutocorrelationTime(
 }
 
 template<typename T, int Dim>
+std::vector<T> OutputAnalysis<T, Dim>::calculateEffectiveSampleSizePerSecond(
+  const typename OutputAnalysis<T, Dim>::SampleOutputsVector& sampleRuns,
+  const std::vector<T>& integratedAutocorrelationTimes,
+  const std::vector<double>& runningTimesInMilliseconds) {
+
+  std::vector<T> effectiveSampleSizesPerSecond;
+  for (int i = 0; i < sampleRuns.size(); i++) {
+    T trajectoryLength = BpsUtils<T, Dim>::getTotalPathLength(sampleRuns[i]);
+    T iact = integratedAutocorrelationTimes[i];
+    T timeInSeconds = (T) runningTimesInMilliseconds[i] / 1000.0;
+
+    effectiveSampleSizesPerSecond.push_back(
+      trajectoryLength / (iact * timeInSeconds));
+  }
+
+  return effectiveSampleSizesPerSecond;
+}
+
+template<typename T, int Dim>
 std::vector<T> OutputAnalysis<T, Dim>::calculateAverageIntereventTime(
     const typename OutputAnalysis<T, Dim>::SampleOutputsVector& sampleRuns) {
 

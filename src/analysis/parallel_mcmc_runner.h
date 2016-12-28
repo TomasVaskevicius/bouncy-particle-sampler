@@ -19,10 +19,10 @@ class ParallelMcmcRunner {
 
  public:
 
-  typedef  std::function<
-             std::unique_ptr<BasicBps<FloatingPointType, Dimensionality>>
-             (void)>
-           BpsFactory;
+  typedef std::function<
+            std::unique_ptr<BasicBps<FloatingPointType, Dimensionality>>
+            (void)>
+          BpsFactory;
 
    /**
     * Runs the given BPS algorithm a specified number of times in parallel
@@ -48,7 +48,8 @@ class ParallelMcmcRunner {
        const BpsFactory& bpsFactory,
        FloatingPointType requiredTrajectoryLengths,
        int numberOfRuns,
-       int numberOfThreads = 8);
+       int numberOfThreads = 8,
+       std::vector<double>* executionTimesForEachRun = nullptr);
 
 };
 

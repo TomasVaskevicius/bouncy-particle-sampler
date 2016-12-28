@@ -29,6 +29,9 @@ class ParallelWorkers {
    *   The number of times the given task needs to be done.
    * @param numberOfThreads
    *   The number of threads we should use to perform the given tasks.
+   * @param executionTimes
+   *   If not nullptr, fills in the given vector with the execution times
+   *   for each task.
    * @return
    *   A vector of results. The size of the vector is equal to the
    *   numberOfRepetitions parameter.
@@ -36,7 +39,8 @@ class ParallelWorkers {
   std::unique_ptr<std::vector<ResultType>> executeTasksInParallel(
       const std::function<ResultType(void)>& task,
       const int& numberOfRepetitions,
-      const int& numberOfThreads);
+      const int& numberOfThreads,
+      std::vector<double>* executionTimes = nullptr);
 
  private:
 
@@ -45,7 +49,8 @@ class ParallelWorkers {
       const int& requestedNumberOfTasks,
       std::vector<ResultType>& sharedResultsVector,
       std::atomic_int& numberOfTasksStarted,
-      const std::function<ResultType(void)>& task);
+      const std::function<ResultType(void)>& task,
+      std::vector<double>* executionTimes);
 
   // Will be used by executeSequentially method.
   std::mutex sequentialExecutionMutex_;

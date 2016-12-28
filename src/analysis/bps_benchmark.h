@@ -118,10 +118,16 @@ class BpsBenchmark {
     const RealFunctionOnSamples& realFunctionOnSamples);
 
   // For each run (numberOfAlgorithms * numberOfRuns) returns the IACT.
-  void outputIACTBoxPlot(
+  std::vector<std::vector<FloatingPointType>> outputIactBoxPlot(
     const std::string& outputDir,
     const ExpectationEstimator& expectationEstimator,
-    const RealFunctionOnSamples& realFunctionOnSamples);
+    const RealFunctionOnSamples& realFunctionOnSamples,
+    const int& numberOfBatches);
+
+  // For each run, outputs the ESS/s.
+  void outputEffectiveSampleSizesPerSecond(
+    const std::string& outputDir,
+    const std::vector<std::vector<FloatingPointType>>& iacts);
 
   // Gets autocorrelation functions for each run of one particular algorithm.
   void outputAutocorrelationFunctions(
@@ -143,6 +149,7 @@ class BpsBenchmark {
   const std::string outputDirectory_;
   PlottingUtils<FloatingPointType> plottingUtils_;
   std::unique_ptr<std::vector<SampleOutputsVector>> sampleOutputs_;
+  std::unique_ptr<std::vector<std::vector<double>>> runningTimes_;
 
 };
 

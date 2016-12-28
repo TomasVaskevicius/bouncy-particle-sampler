@@ -1,6 +1,7 @@
 #pragma once
 
 #include "analysis/utils.h"
+
 #include <iostream>
 
 // TODO:
@@ -111,14 +112,20 @@ void BpsBenchmark<T, Dim>::generateSamples(
 
 
   this->sampleOutputs_.reset(new std::vector<SampleOutputsVector>);
+  this->runningTimes_.reset(new std::vector<std::vector<double>>);
 
   for (int i = 0; i < this->bpsFactories_.size(); i++) {
+    std::vector<double> runningTimesForCurrentAlgorithm;
+
     this->sampleOutputs_->push_back(
       ParallelMcmcRunner<T, Dim>::generateBpsSamples(
         bpsFactories_[i],
         requiredTrajectoryLengths,
         numberOfRunsForEachAlgorithm,
-        numberOfCores));
+        numberOfCores,
+        &runningTimesForCurrentAlgorithm));
+
+    this->runningTimes_->push_back(runningTimesForCurrentAlgorithm);
   }
 }
 
@@ -133,10 +140,14 @@ void BpsBenchmark<T, Dim>::runBenchmark(
 
   std::string outputDir = this->outputDirectory_ + benchmarkName + "/";
 
-  this->outputIACTBoxPlot(
-    outputDir,
-    expectationEstimator,
-    realFunctionOnSamples);
+  std::vector<std::vector<T>> iacts =
+    this->outputIactBoxPlot(
+      outputDir,
+      expectationEstimator,
+      realFunctionOnSamples,
+      numberOfBatchesForBatchMeans);
+
+  this->outputEffectiveSampleSizesPerSecond(outputDir, iacts);
 
   for (int i = 0; i < this->sampleOutputs_->size(); i++) {
     std::string outputDirForThisAlgorithm =
@@ -189,10 +200,11 @@ void BpsBenchmark<T, Dim>::outputErrorsForSampleRuns(
 }
 
 template<typename T, int Dim>
-void BpsBenchmark<T, Dim>::outputIACTBoxPlot(
+std::vector<std::vector<T>> BpsBenchmark<T, Dim>::outputIactBoxPlot(
   const std::string& outputDir,
   const ExpectationEstimator& expectationEstimator,
-  const RealFunctionOnSamples& realFunctionOnSamples) {
+  const RealFunctionOnSamples& realFunctionOnSamples,
+  const int& numberOfBatches) {
 
   std::vector<std::vector<T>> iacts;
   for (const auto& sampleRuns : *this->sampleOutputs_) {
@@ -207,7 +219,29 @@ void BpsBenchmark<T, Dim>::outputIACTBoxPlot(
   this->plottingUtils_.plotBoxPlot(
     iacts,
     this->shortAlgorithmNames_,
-    outputDir + "/iact");
+    outputDir + "iact");
+
+  return iacts;
+}
+
+template<typename T, int Dim>
+void BpsBenchmark<T, Dim>::outputEffectiveSampleSizesPerSecond(
+  const std::string& outputDir,
+  const std::vector<std::vector<T>>& iacts) {
+
+  std::vector<std::vector<T>> essPerSecond;
+  for (int i = 0; i < this->sampleOutputs_->size(); i++) {
+    essPerSecond.push_back(
+      OutputAnalysis<T, Dim>::calculateEffectiveSampleSizePerSecond(
+        *(this->sampleOutputs_->at(i)),
+        iacts[i],
+        this->runningTimes_->at(i)));
+  }
+
+  this->plottingUtils_.plotBoxPlot(
+    essPerSecond,
+    this->shortAlgorithmNames_,
+    outputDir + "essPerSecond");
 }
 
 template<typename T, int Dim>

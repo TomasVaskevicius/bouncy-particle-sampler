@@ -70,6 +70,24 @@ class OutputAnalysis {
       const int& numberOfBatches = 100);
 
   /**
+   * Given algorithm running times and iacts, outputs effective sample size
+   * per second. Both parameter vectors must be of the same size.
+   *
+   * @param integratedAutocorrelationTimes
+   *   A vector of iacts, one element for each different run of algorithm.
+   * @param runningTimesInMilliseconds
+   *   A vector of running times (in ms) for the algorithms, which iacts are
+   *   passed in the other parameter.
+   * @return
+   *   A vector of effective sample sizes per second.
+   */
+  static std::vector<FloatingPointType>
+    calculateEffectiveSampleSizePerSecond(
+      const SampleOutputsVector& sampleRuns,
+      const std::vector<FloatingPointType>& integratedAutocorrelationTimes,
+      const std::vector<double>& runningTimesInMilliseconds);
+
+  /**
    * Calculates the average inter event time for given BPS runs.
    *
    * @param sampleRuns

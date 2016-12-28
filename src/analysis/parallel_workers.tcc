@@ -1,5 +1,7 @@
 #pragma once
 
+#include "analysis/utils.h"
+
 #include <thread>
 
 namespace bps {
@@ -7,10 +9,11 @@ namespace analysis {
 
 template<typename ResultType>
 std::unique_ptr<std::vector<ResultType>> ParallelWorkers<ResultType>
-    ::executeTasksInParallel(
-        const std::function<ResultType(void)>& task,
-        const int& numberOfRepetitions,
-        const int& numberOfThreads) {
+  ::executeTasksInParallel(
+    const std::function<ResultType(void)>& task,
+    const int& numberOfRepetitions,
+    const int& numberOfThreads,
+    std::vector<double>* executionTimes) {
 
   auto resultsVector = std::unique_ptr<std::vector<ResultType>>(
       new std::vector<ResultType>());
@@ -24,7 +27,8 @@ std::unique_ptr<std::vector<ResultType>> ParallelWorkers<ResultType>
         std::ref(numberOfRepetitions),
         std::ref(*resultsVector),
         std::ref(numberOfTasksStarted),
-        std::ref(task)));
+        std::ref(task),
+        executionTimes));
   }
 
   for (auto& thread : activeThreads) {
@@ -36,20 +40,28 @@ std::unique_ptr<std::vector<ResultType>> ParallelWorkers<ResultType>
 
 template<typename ResultType>
 void ParallelWorkers<ResultType>::worker(
-    const int& requestedNumberOfTasks,
-    std::vector<ResultType>& sharedResultsVector,
-    std::atomic_int& numberOfTasksStarted,
-    const std::function<ResultType(void)>& task) {
+  const int& requestedNumberOfTasks,
+  std::vector<ResultType>& sharedResultsVector,
+  std::atomic_int& numberOfTasksStarted,
+  const std::function<ResultType(void)>& task,
+  std::vector<double>* executionTimes) {
 
   while (numberOfTasksStarted.load() < requestedNumberOfTasks) {
     int localNumberOfTasksStarted = numberOfTasksStarted.load();
     if (numberOfTasksStarted.compare_exchange_strong(
             localNumberOfTasksStarted, localNumberOfTasksStarted + 1)) {
 
-      ResultType myResult = task();
+      double executionTime;
+      ResultType myResult = AnalysisUtils::getExecutionTimeAndFunctionResult(
+        task, executionTime);
+
       this->executeSequentially(
-          [&myResult, &sharedResultsVector] () -> void {
+          [&myResult, &sharedResultsVector, &executionTime, &executionTimes]
+          () -> void {
             sharedResultsVector.push_back(myResult);
+            if (executionTimes != nullptr) {
+              executionTimes->push_back(executionTime);
+            }
           });
     }
   }
@@ -57,7 +69,7 @@ void ParallelWorkers<ResultType>::worker(
 
 template<typename ResultType>
 void ParallelWorkers<ResultType>
-    ::executeSequentially(std::function<void()> function) {
+  ::executeSequentially(std::function<void()> function) {
 
   this->sequentialExecutionMutex_.lock();
   function();
