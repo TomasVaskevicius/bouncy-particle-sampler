@@ -117,7 +117,6 @@ void BpsBenchmark<T, Dim>::generateSamples(
     numberOfRunsForEachAlgorithm,
     numberOfCores);
 
-
   this->sampleOutputs_.reset(new std::vector<SampleOutputsVector>);
   this->runningTimes_.reset(new std::vector<std::vector<double>>);
 
@@ -138,7 +137,7 @@ void BpsBenchmark<T, Dim>::generateSamples(
 
 template<typename T, int Dim>
 void BpsBenchmark<T, Dim>::runBenchmark(
-  const ExpectationEstimator& expectationEstimator,
+  const std::vector<ExpectationEstimator>& expectationEstimators,
   const RealFunctionOnSamples& realFunctionOnSamples,
   const std::string& benchmarkName,
   const int& numberOfBatchesForBatchMeans,
@@ -150,7 +149,7 @@ void BpsBenchmark<T, Dim>::runBenchmark(
   std::vector<std::vector<T>> iacts =
     this->outputIactBoxPlot(
       outputDir,
-      expectationEstimator,
+      expectationEstimators,
       realFunctionOnSamples,
       numberOfBatchesForBatchMeans);
 
@@ -165,13 +164,13 @@ void BpsBenchmark<T, Dim>::runBenchmark(
     this->outputErrorsForSampleRuns(
       i,
       outputDirForThisAlgorithm,
-      expectationEstimator,
+      expectationEstimators[i],
       realFunctionOnSamples);
 
     this->outputAutocorrelationFunctions(
       i,
       outputDirForThisAlgorithm,
-      expectationEstimator,
+      expectationEstimators[i],
       realFunctionOnSamples,
       acfLagUpperbound,
       lagStepSize);
@@ -229,17 +228,17 @@ void BpsBenchmark<T, Dim>::outputAverageIntereventTimes(
 template<typename T, int Dim>
 std::vector<std::vector<T>> BpsBenchmark<T, Dim>::outputIactBoxPlot(
   const std::string& outputDir,
-  const ExpectationEstimator& expectationEstimator,
+  const std::vector<ExpectationEstimator>& expectationEstimators,
   const RealFunctionOnSamples& realFunctionOnSamples,
   const int& numberOfBatches) {
 
   std::vector<std::vector<T>> iacts;
-  for (const auto& sampleRuns : *this->sampleOutputs_) {
+  for (int i = 0; i < this->sampleOutputs_->size(); i++) {
     iacts.push_back(
       OutputAnalysis<T, Dim>::calculateIntegratedAutocorrelationTime(
-        *sampleRuns,
+        *(this->sampleOutputs_->at(i)),
         realFunctionOnSamples,
-        expectationEstimator,
+        expectationEstimators[i],
         numberOfBatches));
   }
 
