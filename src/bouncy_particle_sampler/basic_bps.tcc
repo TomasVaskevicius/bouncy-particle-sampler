@@ -84,7 +84,7 @@ typename Mcmc<T, Dim>::SampleOutput BasicBps<T, Dim>
 }
 
 template<typename T, int Dim>
-T BasicBps<T, Dim>::getRefreshRate() {
+T BasicBps<T, Dim>::getRefreshRate() const {
   return this->refreshRate_;
 }
 
@@ -94,16 +94,25 @@ void BasicBps<T, Dim>::setRefreshRate(T refreshRate) {
 }
 
 template<typename T, int Dim>
-T BasicBps<T, Dim>::evaluateIntensityAtState(const BpsState<T, Dim>& state) {
+T BasicBps<T, Dim>::evaluateIntensityAtState(const BpsState<T, Dim>& state)
+  const {
+
   auto position = state.getLocation();
   auto velocity = state.getVelocity();
   T intensity = velocity.dot(this->energyGradient_(position));
-  return intensity;
+  return std::max((T) 0.0, intensity);
 }
 
 template<typename T, int Dim>
-const BounceOperator<T, Dim>& BasicBps<T, Dim>::getBounceOperator() {
-  return this->bounceOperator_;
+BounceOperator<T, Dim>* BasicBps<T, Dim>::getBounceOperator() const {
+  return this->bounceOperator_.get();
+}
+
+template<typename T, int Dim>
+std::function<Eigen::Matrix<T, Dim, 1>(Eigen::Matrix<T, Dim, 1>)>
+  BasicBps<T, Dim>::getEnergyGradient() const {
+
+  return this->energyGradient_;
 }
 
 template<typename T, int Dim>

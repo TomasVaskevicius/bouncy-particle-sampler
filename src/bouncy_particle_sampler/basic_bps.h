@@ -35,7 +35,6 @@ class BasicBps : public Mcmc<FloatingPointType, Dimensionality> {
   std::unique_ptr<McmcState<FloatingPointType, Dimensionality>>
       generateNextState() const override;
 
-
   /**
    * Returns a vector of samples such that the total trajectory length
    * is at least as long as the requested length.
@@ -46,7 +45,7 @@ class BasicBps : public Mcmc<FloatingPointType, Dimensionality> {
   /**
    * Returns the refresh rate.
    */
-  FloatingPointType getRefreshRate();
+  FloatingPointType getRefreshRate() const;
 
   /**
    * Changes the refresh rate.
@@ -57,12 +56,20 @@ class BasicBps : public Mcmc<FloatingPointType, Dimensionality> {
    * Evaluates the Poisson process intensity function at the given state.
    */
   FloatingPointType evaluateIntensityAtState(
-      const BpsState<FloatingPointType, Dimensionality>& state);
+      const BpsState<FloatingPointType, Dimensionality>& state) const;
 
   /**
    * Returns the bounce operator used by this algorithm.
    */
-  const BounceOperator<FloatingPointType, Dimensionality>& getBounceOperator();
+  BounceOperator<FloatingPointType, Dimensionality>*
+    getBounceOperator() const;
+
+  /**
+   * Returns the energy gradient function.
+   */
+  std::function<Eigen::Matrix<FloatingPointType, Dimensionality, 1>(
+                Eigen::Matrix<FloatingPointType, Dimensionality, 1>)>
+    getEnergyGradient() const;
 
  protected:
 
