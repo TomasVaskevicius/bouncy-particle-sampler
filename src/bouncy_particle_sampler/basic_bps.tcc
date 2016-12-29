@@ -18,9 +18,8 @@ namespace bps {
 
 template<typename T, int Dim>
 BasicBps<T, Dim>::BasicBps(
-    T refreshRate,
-    std::function<Eigen::Matrix<T, Dim, 1>(Eigen::Matrix<T, Dim, 1>)>
-        energyGradient)
+    const T& refreshRate,
+    const EnergyGradient& energyGradient)
   : refreshRate_(refreshRate),
     energyGradient_(energyGradient),
     bounceOperator_(std::move(std::unique_ptr<BounceOperator<T, Dim>>(

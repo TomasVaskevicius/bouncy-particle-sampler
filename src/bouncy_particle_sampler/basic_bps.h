@@ -23,14 +23,17 @@ class BasicBps : public Mcmc<FloatingPointType, Dimensionality> {
 
  public:
 
+  typedef std::function<Eigen::Matrix<FloatingPointType, Dimensionality, 1>(
+                        Eigen::Matrix<FloatingPointType, Dimensionality, 1>)>
+          EnergyGradient;
+
   /**
     * Right now the most basic implementation takes only refresh rate and
     * the energyGradient as a parameter.
     */
   BasicBps(
-      FloatingPointType refreshRate,
-      std::function<Eigen::Matrix<FloatingPointType, Dimensionality, 1>(
-          Eigen::Matrix<FloatingPointType, Dimensionality, 1>)> energyGradient);
+      const FloatingPointType& refreshRate,
+      const EnergyGradient& energyGradient);
 
   std::unique_ptr<McmcState<FloatingPointType, Dimensionality>>
       generateNextState() const override;
