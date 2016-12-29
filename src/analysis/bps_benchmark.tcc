@@ -132,6 +132,16 @@ void BpsBenchmark<T, Dim>::generateSamples(
         &runningTimesForCurrentAlgorithm));
 
     this->runningTimes_->push_back(runningTimesForCurrentAlgorithm);
+
+  if (Dim == 2) {
+    this->plotTwoDimensionalSamplePaths(
+      i,
+      this->outputDirectory_
+        + "sample_runs/"
+        + this->shortAlgorithmNames_[i]
+        + "/");
+    }
+
   }
 }
 
@@ -159,7 +169,7 @@ void BpsBenchmark<T, Dim>::runBenchmark(
 
   for (int i = 0; i < this->sampleOutputs_->size(); i++) {
     std::string outputDirForThisAlgorithm =
-      outputDir + this->shortAlgorithmNames_[i] + "/";
+      outputDir + this->shortAlgorithmNames_[i] + "_";
 
     this->outputErrorsForSampleRuns(
       i,
@@ -174,12 +184,6 @@ void BpsBenchmark<T, Dim>::runBenchmark(
       realFunctionOnSamples,
       acfLagUpperbound,
       lagStepSize);
-
-    if (Dim == 2) {
-      this->plotTwoDimensionalSamplePaths(
-        i,
-        outputDirForThisAlgorithm + "sample_runs/");
-    }
   }
 }
 
