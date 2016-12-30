@@ -18,6 +18,8 @@ class OutputAnalysis {
             typename Mcmc<FloatingPointType, Dimensionality>::SampleOutput>
           SampleOutputsVector;
 
+  typedef typename Mcmc<FloatingPointType, Dimensionality>::SampleOutput
+          SampleOutput;
 
   typedef std::function<std::vector<FloatingPointType>(
             const typename Mcmc<FloatingPointType, Dimensionality>::SampleOutput&,
@@ -159,6 +161,24 @@ class OutputAnalysis {
        const ExpecatationEstimator& expectationEstimator);
 
   /**
+   * Estimates the mean from a sample run.
+   *
+   * @param sampleRun
+   *   A sample runs of the BPS algorithm.
+   * @param functinoToEstimate
+   *   A function which will be aplied to BPS samples.
+   * @param expectationEstimator
+   *   An estimator used for expectation calculations.
+   * @return
+   *   An estimate of the mean.
+   */
+  static FloatingPointType estimateMean(
+       const SampleOutput& sampleRun,
+       const typename Mcmc<FloatingPointType, Dimensionality>
+         ::RealFunctionOnSamples& functionToEstimate,
+       const ExpecatationEstimator& expectationEstimator);
+
+  /**
    * Estimates the variance from a vector of sample runs.
    * The variance is estimated separately over separate runs and then the
    * average is taken.
@@ -181,6 +201,26 @@ class OutputAnalysis {
        const ExpecatationEstimator& expectationEstimator,
        const FloatingPointType& meanEstimate);
 
+  /**
+   * Estimates the variance from a sample run.
+   *
+   * @param sampleRun
+   *   A sample runs of the BPS algorithm.
+   * @param functinoToEstimate
+   *   A function which will be aplied to BPS samples.
+   * @param expectationEstimator
+   *   An estimator used for expectation calculations.
+   * @param meanEstimate
+   *   A mean estimate for the given sampleRun.
+   * @return
+   *   An estimate of the mean.
+   */
+  static FloatingPointType estimateVariance(
+       const SampleOutput& sampleRun,
+       const typename Mcmc<FloatingPointType, Dimensionality>
+         ::RealFunctionOnSamples& functionToEstimate,
+       const ExpecatationEstimator& expectationEstimator,
+       const FloatingPointType& meanEstimate);
 };
 
 }

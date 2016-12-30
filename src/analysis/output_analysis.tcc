@@ -169,11 +169,6 @@ std::vector<std::vector<T>>
     const int& lagUpperbound,
     const int& lagStepSize) {
 
-  T mean = estimateMeanFromSampleRuns(
-      sampleRuns, functionToEstimate, expectationEstimator);
-  T variance = estimateVarianceFromSampleRuns(
-      sampleRuns, functionToEstimate, expectationEstimator, mean);
-
   std::vector<int> lags;
   for (int i = 0; i <= lagUpperbound; i += lagStepSize) {
     lags.push_back(i);
@@ -183,6 +178,11 @@ std::vector<std::vector<T>>
   std::for_each(sampleRuns.begin(),
                 sampleRuns.end(),
                 [&] (const typename Mcmc<T, Dim>::SampleOutput& sampleRun) {
+                  T mean = estimateMean(
+                    sampleRun, functionToEstimate, expectationEstimator);
+                  T variance = estimateVariance(
+                    sampleRun, functionToEstimate, expectationEstimator, mean);
+
                   std::vector<T> acfForCurrentSampleRun;
                   for (const int& lag : lags) {
                     acfForCurrentSampleRun.push_back(
@@ -216,6 +216,18 @@ T OutputAnalysis<T, Dim>::estimateMeanFromSampleRuns(
 }
 
 template<typename T, int Dim>
+T OutputAnalysis<T, Dim>::estimateMean(
+       const SampleOutput& sampleRun,
+       const typename Mcmc<T, Dim>
+         ::RealFunctionOnSamples& functionToEstimate,
+       const ExpecatationEstimator& expectationEstimator) {
+
+  std::vector<T> expectationEstimates =
+    expectationEstimator(sampleRun, functionToEstimate);
+  return expectationEstimates[expectationEstimates.size() - 1];
+}
+
+template<typename T, int Dim>
 T OutputAnalysis<T, Dim>::estimateVarianceFromSampleRuns(
        const SampleOutputsVector& sampleRuns,
        const typename Mcmc<T, Dim>
@@ -231,6 +243,28 @@ T OutputAnalysis<T, Dim>::estimateVarianceFromSampleRuns(
 
   T meanOfSquaredFunction = estimateMeanFromSampleRuns(
       sampleRuns,
+      squaredFunction,
+      expectationEstimator);
+
+  return meanOfSquaredFunction - meanEstimate * meanEstimate;
+}
+
+template<typename T, int Dim>
+T OutputAnalysis<T, Dim>::estimateVariance(
+       const SampleOutput& sampleRun,
+       const typename Mcmc<T, Dim>
+         ::RealFunctionOnSamples& functionToEstimate,
+       const ExpecatationEstimator& expectationEstimator,
+       const T& meanEstimate) {
+
+  auto squaredFunction =
+    [&functionToEstimate] (Eigen::Matrix<T, Dim, 1> vector) -> T {
+      T value = functionToEstimate(vector);
+      return value * value;
+    };
+
+  T meanOfSquaredFunction = estimateMean(
+      sampleRun,
       squaredFunction,
       expectationEstimator);
 
