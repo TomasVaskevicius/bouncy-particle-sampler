@@ -188,6 +188,26 @@ void BpsBenchmark<T, Dim>::runBenchmark(
 }
 
 template<typename T, int Dim>
+void BpsBenchmark<T, Dim>::runCustomFunctionOnSamplesWithNumericalOutputs(
+  const std::vector<std::function<T(SampleRun)>>& functions,
+  const std::string& name) {
+
+  std::vector<std::vector<T>> functionOutputs;
+  for (int i = 0; i < this->sampleOutputs_->size(); i++) {
+    std::vector<T> functionOutputsForCurrentAlgorithm;
+    for (const auto& sampleRun : *this->sampleOutputs_->at(i)) {
+      functionOutputsForCurrentAlgorithm.push_back(functions[i](sampleRun));
+    }
+    functionOutputs.push_back(functionOutputsForCurrentAlgorithm);
+  }
+
+  this->plottingUtils_.plotBoxPlot(
+    functionOutputs,
+    this->shortAlgorithmNames_,
+    this->outputDirectory_ + name);
+}
+
+template<typename T, int Dim>
 void BpsBenchmark<T, Dim>::outputErrorsForSampleRuns(
   const int& algorithmId,
   const std::string& outputDir,

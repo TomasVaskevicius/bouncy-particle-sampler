@@ -23,9 +23,10 @@ class BpsBenchmark {
             FloatingPointType, Dimensionality>::BpsFactory>
           BpsFactoriesVector;
 
-  typedef std::shared_ptr<typename OutputAnalysis<
-            FloatingPointType, Dimensionality>::SampleOutputsVector>
-          SampleOutputsVector;
+  typedef typename Mcmc<FloatingPointType, Dimensionality>::SampleOutput
+          SampleRun;
+
+  typedef std::shared_ptr<std::vector<SampleRun>> SampleOutputsVector;
 
   typedef typename OutputAnalysis<FloatingPointType, Dimensionality>
             ::ExpecatationEstimator
@@ -107,6 +108,22 @@ class BpsBenchmark {
     const int& numberOfBatchesForBatchMeans = 100,
     const int& acfLagUpperbound = 100,
     const int& lagStepSize = 1);
+
+  /**
+   * Runs a custom function on the samples of each algorithm given by the user.
+   * The given functions must have a numeric return type.
+   * A box plot will be generated for each of the algorithm by running the
+   * given function on each of its sample runs.
+   * The functions vector must be of the same size as the number of algorithms.
+   * @param functions
+   *   The functions vector which should be run on each sample run of each
+   *  algorithm.
+   * @param name
+   *   Name for outputting the results.
+   */
+  void runCustomFunctionOnSamplesWithNumericalOutputs(
+    const std::vector<std::function<FloatingPointType(SampleRun)>>& functions,
+    const std::string& name);
 
  private:
 
