@@ -1,7 +1,9 @@
 #pragma once
 
 #include "bouncy_particle_sampler/bps_utils.h"
+#include "bouncy_particle_sampler/linear_flow.h"
 #include "bouncy_particle_sampler/newtonian_bounce_operator.h"
+#include "bouncy_particle_sampler/numerical_pp_strategy.h"
 #include "core/mcmc.h"
 #include "poisson_process/homogeneous_poisson_process.h"
 #include "poisson_process/nhpp_by_approximating_quantile.h"
@@ -9,21 +11,30 @@
 #include <algorithm>
 #include <random>
 
-// Todo:
-//
-// 1) Refactor the flow function (linear flow in this case).
-// 2) Refactor the Poisson Process factory.
-
 namespace bps {
 
 template<typename T, int Dim>
 BasicBps<T, Dim>::BasicBps(
-    const T& refreshRate,
-    const EnergyGradient& energyGradient)
+  const T& refreshRate,
+  const EnergyGradient& energyGradient)
+  : BasicBps(
+    refreshRate,
+    energyGradient,
+    std::move(std::unique_ptr<BpsPoissonProcessStrategy<T, Dim>>(
+      new NumericalPoissonProcessStrategy<T, Dim>(energyGradient)))) {
+}
+
+template<typename T, int Dim>
+BasicBps<T, Dim>::BasicBps(
+  const T& refreshRate,
+  const EnergyGradient& energyGradient,
+  std::unique_ptr<BpsPoissonProcessStrategy<T, Dim>> ppStrategy)
   : refreshRate_(refreshRate),
     energyGradient_(energyGradient),
     bounceOperator_(std::move(std::unique_ptr<BounceOperator<T, Dim>>(
-        new NewtonianBounceOperator<T, Dim>()))) {
+      new NewtonianBounceOperator<T, Dim>()))),
+    ppStrategy_(std::move(ppStrategy)),
+    flow_(std::shared_ptr<BpsFlow<T, Dim>>(new BpsLinearFlow<T, Dim>())) {
 
   this->lastState_ = this->getInitialState();
 }
@@ -33,25 +44,23 @@ std::unique_ptr<McmcState<T, Dim>> BasicBps<T, Dim>::generateNextState() const {
   auto lastState = static_cast<BpsState<T, Dim>*>(this->lastState_.get());
 
   HomogeneousPoissonProcess<T> refreshmentPoissonProcess(this->refreshRate_);
-  auto bouncePoissonProcess = this->generatePoissonProcessForState(
-      *lastState);
 
   T lastEventTime = lastState->getLastEventTime();
   T refreshmentInterarrivalTime = refreshmentPoissonProcess.getNextSample()(0);
-  T bounceInterarrivalTime = bouncePoissonProcess->getNextSample()(0);
+  T bounceInterarrivalTime = this->ppStrategy_->getNextEventTime(*lastState);
 
   if (refreshmentInterarrivalTime < bounceInterarrivalTime) {
     // Simulate refreshment event.
-    auto newPosition = this->calculateNewPosition(
-        *lastState, refreshmentInterarrivalTime);
+    auto newPosition = this->flow_->advanceStateByFlowFunction(
+      *lastState, refreshmentInterarrivalTime).getLocation();
     auto newVelocity = this->getRefreshedVelocity();
     T newEventTime = lastEventTime + refreshmentInterarrivalTime;
     return BpsUtils<T, Dim>::createBpsMcmcState(
         newPosition, newVelocity, newEventTime);
   } else {
     // Simulate bounce event.
-    auto newPosition = this->calculateNewPosition(
-        *lastState, bounceInterarrivalTime);
+    auto newPosition = this->flow_->advanceStateByFlowFunction(
+      *lastState, bounceInterarrivalTime).getLocation();
     T newEventTime = lastEventTime + bounceInterarrivalTime;
     BpsState<T, Dim> bpsState(
         newPosition, lastState->getVelocity(), newEventTime);
@@ -133,33 +142,6 @@ Eigen::Matrix<T, Dim, 1> BasicBps<T, Dim>::getRefreshedVelocity() const {
   }
 
   return refreshedVelocity;
-}
-
-template<typename T, int Dim>
-std::unique_ptr<PoissonProcess<T>> BasicBps<T, Dim>
-    ::generatePoissonProcessForState(const BpsState<T, Dim>& state) const {
-
-  auto startingPosition = state.getLocation();
-  auto velocity = state.getVelocity();
-
-  return std::unique_ptr<PoissonProcess<T>>(
-      new NonHomogeneousPoissonProcessByApproximatingQuantile<T>(
-          [this, state] (T t) -> T {
-            auto positionAtTimeT = this->calculateNewPosition(state, t);
-            auto intensity = state.getVelocity().dot(
-                this->energyGradient_(positionAtTimeT));
-
-            return std::max((T) 0.0, intensity);
-          }));
-}
-
-template<typename T, int Dim>
-Eigen::Matrix<T, Dim, 1> BasicBps<T, Dim>::calculateNewPosition(
-    const BpsState<T, Dim>& state, T time) const {
-
-  auto lastPosition = state.getLocation();
-  auto velocity = state.getVelocity();
-  return lastPosition + velocity * time;
 }
 
 }

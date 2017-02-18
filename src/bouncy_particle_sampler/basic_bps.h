@@ -3,6 +3,8 @@
 #include "core/mcmc.h"
 #include "bouncy_particle_sampler/bounce_operator.h"
 #include "bouncy_particle_sampler/bps_state.h"
+#include "bouncy_particle_sampler/bps_flow.h"
+#include "bouncy_particle_sampler/pp_strategy.h"
 #include "poisson_process/poisson_process.h"
 
 #include <memory>
@@ -30,10 +32,23 @@ class BasicBps : public Mcmc<FloatingPointType, Dimensionality> {
   /**
     * Right now the most basic implementation takes only refresh rate and
     * the energyGradient as a parameter.
+    *
+    * This constructor will default to using numerical strategy for generating
+    * the Poisson process samples.
     */
   BasicBps(
-      const FloatingPointType& refreshRate,
-      const EnergyGradient& energyGradient);
+    const FloatingPointType& refreshRate,
+    const EnergyGradient& energyGradient);
+
+  /**
+   * This constructor allows to give a user defined Poisson process generation
+   * strategy.
+   */
+  BasicBps(
+    const FloatingPointType& refreshRate,
+    const EnergyGradient& energyGradient,
+    std::unique_ptr<BpsPoissonProcessStrategy<
+      FloatingPointType, Dimensionality>> ppStrategy);
 
   std::unique_ptr<McmcState<FloatingPointType, Dimensionality>>
       generateNextState() const override;
@@ -82,23 +97,20 @@ class BasicBps : public Mcmc<FloatingPointType, Dimensionality> {
  private:
 
   Eigen::Matrix<FloatingPointType, Dimensionality, 1> getRefreshedVelocity()
-      const;
-
-  std::unique_ptr<PoissonProcess<FloatingPointType>>
-      generatePoissonProcessForState(
-          const BpsState<FloatingPointType, Dimensionality>& state) const;
-
-  Eigen::Matrix<FloatingPointType, Dimensionality, 1> calculateNewPosition(
-      const BpsState<FloatingPointType, Dimensionality>& state,
-      FloatingPointType time) const;
+    const;
 
   FloatingPointType refreshRate_;
 
   const std::function<Eigen::Matrix<FloatingPointType, Dimensionality, 1>(
-      Eigen::Matrix<FloatingPointType, Dimensionality, 1>)> energyGradient_;
+    Eigen::Matrix<FloatingPointType, Dimensionality, 1>)> energyGradient_;
 
   const std::unique_ptr<BounceOperator<FloatingPointType, Dimensionality>>
-      bounceOperator_;
+    bounceOperator_;
+
+  std::shared_ptr<BpsFlow<FloatingPointType, Dimensionality>> flow_;
+
+  const std::unique_ptr<BpsPoissonProcessStrategy<
+    FloatingPointType, Dimensionality>> ppStrategy_;
 };
 
 }
