@@ -1,6 +1,7 @@
 #include "analysis/bps_benchmark.h"
 #include "analysis/parallel_mcmc_runner.h"
 #include "bouncy_particle_sampler/basic_bps.h"
+#include "bouncy_particle_sampler/gaussian_pp_strategy.h"
 #include "distributions/gaussian.h"
 
 #include <string>
@@ -31,7 +32,7 @@ vector<vector<ExpectationEstimator>> getExpectationEstimators(
 
 int main() {
   const int numberOfRunsForEachAlgorithm = 20;
-  const double requiredTrajectoryLengths = 1000.0;
+  const double requiredTrajectoryLengths = 100.0;
 
   vector<string> names, shortNames;
   vector<BpsFactory> bpsFactories = getBpsFactories(names, shortNames);
@@ -77,18 +78,30 @@ EnergyGradient getEnergyGradientForTesting() {
 vector<BpsFactory> getBpsFactories(
   vector<string>& names, vector<string>& shortNames) {
 
+  Eigen::Matrix<double, 2, 2> inverseOfCovarianceMatrix;
+  inverseOfCovarianceMatrix << 1, 0,
+                               0, 1;
+
   EnergyGradient energyGradient = getEnergyGradientForTesting();
 
+
   std::vector<BpsFactory> bpsFactories;
-  for (double refreshRate = 1e-4; refreshRate <= 10.0; refreshRate *= 10.0) {
+  for (double refreshRate = 1e-3; refreshRate <= 1e-1; refreshRate *= 10.0) {
     bpsFactories.push_back(
-      [refreshRate, energyGradient] () -> std::unique_ptr<Bps> {
-        return std::unique_ptr<Bps>(new Bps(refreshRate, energyGradient));
+      [refreshRate, energyGradient, inverseOfCovarianceMatrix]
+        () -> std::unique_ptr<Bps> {
+
+        std::unique_ptr<bps::BpsPoissonProcessStrategy<double, 2>> ppStrategy(
+          new bps::PoissonProcessStrategyForGaussianTarget<double, 2>(
+            inverseOfCovarianceMatrix, energyGradient));
+
+        return std::unique_ptr<Bps>(
+          new Bps(refreshRate, energyGradient, std::move(ppStrategy)));
       });
   }
 
   names = std::vector<string>({
-    "1e-4", "1e-3", "1e-2", "1e-1", "1.0", "10.0"});
+    "1e-3", "1e-2", "1e-1"});
   shortNames = names;
 
   return bpsFactories;
