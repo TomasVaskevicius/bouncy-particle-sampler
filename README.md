@@ -26,7 +26,7 @@ cmake ..
 sudo make install
 ```
 
-## Building the examples
+## Building the examples and running tests
 
 After resolving dependencies, the examples can be built as follows:
 
@@ -36,8 +36,9 @@ cd bouncy-particle-sampler
 mkdir build && cd build
 cmake ..
 make
-````
-
+```
 Then, for example, to run the benchmarking example execute:
-
 `./examples/benchmarking_example/benchmarking_example`
+
+And to run the unit tests, execute:
+`ctest`

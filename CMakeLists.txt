@@ -51,3 +51,6 @@ set(BPS_LINK_LIBRARIES ${CVODES_LIBRARIES}
                        Threads::Threads)
 
 add_subdirectory(examples)
+
+enable_testing()
+add_subdirectory(tests)
