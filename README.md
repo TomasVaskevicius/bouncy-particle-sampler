@@ -7,12 +7,13 @@ Building the project requires having installed the development packages for:
   * GSL (GNU Scientific Library)
   * Qt5 (Core, Gui, PrintSupport and Widgets components are needed)
   * CVODES 2.9.0 (Required by the Stan-Math library)
+  * Boost (Required by the Stan-Math library, the latest version is recommended)
 
 Resolving dependencies for Ubuntu:
-`sudo apt-get install libgsl-dev qtbase5-dev`
+`sudo apt-get install libgsl-dev qtbase5-dev libboost-all-dev`
 
 Resolving dependencies for Mac OS X:
-`brew install gsl qt`
+`brew install gsl qt boost`
 
 The Sundials CVODES library can be found [here](http://computation.llnl.gov/projects/sundials/sundials-software).
 You can download and install this library by following these instructions:

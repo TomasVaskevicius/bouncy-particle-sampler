@@ -21,8 +21,9 @@ find_package(Qt5 COMPONENTS Core Gui Widgets PrintSupport REQUIRED)
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
-# Find CVODES (required by the Stan-Math library).
+# Find CVODES and Boost (required by the Stan-Math library).
 find_package(CVODES REQUIRED)
+find_package(Boost REQUIRED)
 
 # Add all project's include directories.
 set(Eigen_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/third_party/eigen_3.3.0)
@@ -30,6 +31,7 @@ set(QCustomPlot_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/third_party/qcustomplot_2.0.0_
 include_directories(${PROJECT_SOURCE_DIR}/src)
 include_directories(${GSL_INCLUDE_DIRS})
 # We add third party headers as system headers to supress g++ warnings.
+include_directories(system ${Boost_INCLUDE_DIR})
 include_directories(system ${CVODES_INCLUDE_DIR})
 include_directories(system ${Eigen_INCLUDE_DIR})
 include_directories(system ${QCustomPlot_INCLUDE_DIR})
