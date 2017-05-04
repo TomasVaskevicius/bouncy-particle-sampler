@@ -20,7 +20,7 @@
 TEST(LinearFlowTest, TestLinearFlowCalculationsAreCorrect) {
   const int dimension = 6;
   using State = pdmp::PositionAndVelocityState<float, dimension>;
-  using RealVector = State::RealVector;
+  using RealVector = State::RealVector<dimension / 2>;
 
   const RealVector initialPoisition(1.0f, 2.0f, 3.0f);
   const RealVector initialVelocity(2.5f, 3.25f, 5.0f);
