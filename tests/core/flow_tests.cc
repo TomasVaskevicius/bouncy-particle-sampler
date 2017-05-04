@@ -1,6 +1,3 @@
-#include <iostream>
-
-#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include "core/flow/linear_flow.h"
