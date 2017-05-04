@@ -1,3 +1,5 @@
+#include <vector>
+
 #include <gtest/gtest.h>
 
 #include "core/flow/linear_flow.h"
@@ -32,6 +34,49 @@ TEST(LinearFlowTest, TestLinearFlowCalculationsAreCorrect) {
     initialState, time);
 
   EXPECT_TRUE(actualState == expectedState);
+}
+
+TEST(LinearFlowTest, TestDependenciesCalculationForPositionVariable) {
+  auto dependencies = pdmp::LinearFlow::getDependentVariableIds(0, 10);
+  std::vector<int> expectedDependencies{0};
+  EXPECT_TRUE(expectedDependencies == dependencies);
+}
+
+TEST(LinearFlowTest, TestDependenciesCalculationForVelocityVariable) {
+  auto dependencies = pdmp::LinearFlow::getDependentVariableIds(9, 10);
+  std::vector<int> expectedDependencies{4, 9};
+  EXPECT_TRUE(expectedDependencies == dependencies);
+}
+
+TEST(
+  LinearFlowTest,
+  TestInvalidDimensionalityInDependenciesCalculationThrowsAnException) {
+
+  EXPECT_THROW(
+    pdmp::LinearFlow::getDependentVariableIds(0, 3),
+    std::logic_error);
+  EXPECT_THROW(
+    pdmp::LinearFlow::getDependentVariableIds(0, 0),
+    std::logic_error);
+  EXPECT_THROW(
+    pdmp::LinearFlow::getDependentVariableIds(0, -2),
+    std::logic_error);
+}
+
+TEST(
+  LinearFlowTest,
+  TestVariableIdOutOfRangeInDependenciesCalculation) {
+
+  EXPECT_THROW(
+    pdmp::LinearFlow::getDependentVariableIds(-1, 2),
+    std::out_of_range);
+  EXPECT_THROW(
+    pdmp::LinearFlow::getDependentVariableIds(2, 2),
+    std::out_of_range);
+}
+
+TEST(LinearFlowTest, TestInvalidDimensionalityThrowsAnException) {
+
 }
 
 int main(int argc, char **argv) {
