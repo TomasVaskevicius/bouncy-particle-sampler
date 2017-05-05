@@ -17,7 +17,7 @@ class PositionAndVelocityStateTests : public ::testing::Test {
   using RealVector = State::RealVector<2>;
 
   PositionAndVelocityStateTests()
-    : state_(*(new RealVector(1.0f, 2.0f)), *(new RealVector(3.0f, 4.0f))) {
+    : state_(RealVector(1.0f, 2.0f), RealVector(3.0f, 4.0f)) {
   }
 
   const State state_;
