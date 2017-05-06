@@ -17,14 +17,8 @@ struct TupleIndexSequences {
   static constexpr auto ids =
     std::make_index_sequence<std::tuple_size<std::decay_t<Tuple>>::value>{};
 };
-}
 
-/**
- * Not all instances of Pdmp will need to define a separate policy for
- * calculating intensity at a given state. We provide a dummy intensity
- * implementation for such use cases.
- */
-class NoOpIntensity {};
+}
 
 /**
  * A data structure for holding relevant information of each simulated
@@ -68,12 +62,10 @@ bool operator==(
 template<
   class PoissonProcess,
   class MarkovKernel,
-  class Intensity = NoOpIntensity,
   class Flow = LinearFlow>
 class Pdmp :
   public PoissonProcess,
   public MarkovKernel,
-  public Intensity,
   public Flow {
 
  public:
@@ -90,12 +82,10 @@ class Pdmp :
    */
   template<
     class PoissonProcessArgsTuple,
-    class MarkovKernelArgsTuple,
-    class IntensityArgsTuple = decltype(std::make_tuple())>
+    class MarkovKernelArgsTuple>
   Pdmp(
     PoissonProcessArgsTuple&& poissonProcessArgs,
-    MarkovKernelArgsTuple&& markovKernelArgs,
-    IntensityArgsTuple&& intensityArgs = std::make_tuple());
+    MarkovKernelArgsTuple&& markovKernelArgs);
 
   /**
    * Simulates one complete iteration of the process. That is, starting from
@@ -117,15 +107,12 @@ class Pdmp :
   // A helper constructor with tuple index sequence types information.
   template<
     class PoissonProcessArgsTuple, size_t... PoissonProcessIndexSeq,
-    class MarkovKernelArgsTuple, size_t... MarkovKernelIndexSeq,
-    class IntensityArgsTuple, size_t... IntensityIndexSeq>
+    class MarkovKernelArgsTuple, size_t... MarkovKernelIndexSeq>
   Pdmp(
     PoissonProcessArgsTuple&& poissonProcessArgs,
     MarkovKernelArgsTuple&& markovKernelArgs,
-    IntensityArgsTuple&& intensityArgs,
     std::index_sequence<PoissonProcessIndexSeq...>,
-    std::index_sequence<MarkovKernelIndexSeq...>,
-    std::index_sequence<IntensityIndexSeq...>);
+    std::index_sequence<MarkovKernelIndexSeq...>);
 
 };
 

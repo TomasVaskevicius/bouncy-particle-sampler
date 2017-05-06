@@ -50,43 +50,20 @@ TEST(PdmpHostClassTests, TestPdmpWithMockPolicies) {
 
 TEST(PdmpConstructorsTests, TestDefaultConstructor) {
   DummyPdmp pdmp;
-
   EXPECT_TRUE(pdmp.dummyPoissonProcessVariable == 0);
   EXPECT_TRUE(pdmp.dummyMarkovKernelVariable == 0);
-  EXPECT_TRUE(pdmp.dummyIntensityVariable == 0);
 }
 
 TEST(PdmpConstructorsTests, TestConstructorUnwrappingTuples) {
-  DummyPdmp pdmp(
-    std::make_tuple(1),
-    std::make_tuple(2),
-    std::make_tuple(3));
-
+  DummyPdmp pdmp(std::make_tuple(1), std::make_tuple(2));
   EXPECT_TRUE(pdmp.dummyPoissonProcessVariable == 1);
   EXPECT_TRUE(pdmp.dummyMarkovKernelVariable == 2);
-  EXPECT_TRUE(pdmp.dummyIntensityVariable == 3);
 }
 
 TEST(PdmpConstructorsTests, TestConstructorWithEmptyTuple) {
-  DummyPdmp pdmp(
-    std::make_tuple(1),
-    std::make_tuple(2),
-    std::make_tuple());
-
+  DummyPdmp pdmp(std::make_tuple(1), std::make_tuple());
   EXPECT_TRUE(pdmp.dummyPoissonProcessVariable == 1);
-  EXPECT_TRUE(pdmp.dummyMarkovKernelVariable == 2);
-  EXPECT_TRUE(pdmp.dummyIntensityVariable == 0);
-}
-
-TEST(PdmpConstructorsTests, TestDefaultArgumentForIntensityTuple) {
-  DummyPdmp pdmp(
-    std::make_tuple(1),
-    std::make_tuple(2));
-
-  EXPECT_TRUE(pdmp.dummyPoissonProcessVariable == 1);
-  EXPECT_TRUE(pdmp.dummyMarkovKernelVariable == 2);
-  EXPECT_TRUE(pdmp.dummyIntensityVariable == 0);
-
+  EXPECT_TRUE(pdmp.dummyMarkovKernelVariable == 0);
 }
 
 int main(int argc, char **argv) {

@@ -24,46 +24,36 @@ bool operator==(
 // Constructor for initialising base classes.
 // Collects type information on the given tuples and delegates to the
 // private constructor.
-template<class PoissonProcess, class MarkovKernel, class Intensity, class Flow>
-template<
-  class PoissonProcessArgsTuple,
-  class MarkovKernelArgsTuple,
-  class IntensityArgsTuple>
-Pdmp<PoissonProcess, MarkovKernel, Intensity, Flow>::Pdmp(
+template<class PoissonProcess, class MarkovKernel, class Flow>
+template<class PoissonProcessArgsTuple, class MarkovKernelArgsTuple>
+Pdmp<PoissonProcess, MarkovKernel, Flow>::Pdmp(
   PoissonProcessArgsTuple&& poissonProcessArgs,
-  MarkovKernelArgsTuple&& markovKernelArgs,
-  IntensityArgsTuple&& intensityArgs)
+  MarkovKernelArgsTuple&& markovKernelArgs)
   : Pdmp(
     std::forward<PoissonProcessArgsTuple>(poissonProcessArgs),
     std::forward<MarkovKernelArgsTuple>(markovKernelArgs),
-    std::forward<IntensityArgsTuple>(intensityArgs),
     helpers::TupleIndexSequences<PoissonProcessArgsTuple>::ids,
-    helpers::TupleIndexSequences<MarkovKernelArgsTuple>::ids,
-    helpers::TupleIndexSequences<IntensityArgsTuple>::ids) {
+    helpers::TupleIndexSequences<MarkovKernelArgsTuple>::ids) {
 }
 
 // The private constructor, unwrapping the given tuples and initialising and
 // passing the arguments to base classes.
-template<class PoissonProcess, class MarkovKernel, class Intensity, class Flow>
+template<class PoissonProcess, class MarkovKernel, class Flow>
 template<
   class PoissonProcessArgsTuple, size_t... PoissonProcessIds,
-  class MarkovKernelArgsTuple, size_t... MarkovKernelIds,
-  class IntensityArgsTuple, size_t... IntensityIds>
-Pdmp<PoissonProcess, MarkovKernel, Intensity, Flow>::Pdmp(
+  class MarkovKernelArgsTuple, size_t... MarkovKernelIds>
+Pdmp<PoissonProcess, MarkovKernel, Flow>::Pdmp(
   PoissonProcessArgsTuple&& poissonProcessArgs,
   MarkovKernelArgsTuple&& markovKernelArgs,
-  IntensityArgsTuple&& intensityArgs,
   std::index_sequence<PoissonProcessIds...>,
-  std::index_sequence<MarkovKernelIds...>,
-  std::index_sequence<IntensityIds...>)
+  std::index_sequence<MarkovKernelIds...>)
   : PoissonProcess(std::get<PoissonProcessIds>(poissonProcessArgs)...),
-    MarkovKernel(std::get<MarkovKernelIds>(markovKernelArgs)...),
-    Intensity(std::get<IntensityIds>(intensityArgs)...) {
+    MarkovKernel(std::get<MarkovKernelIds>(markovKernelArgs)...) {
 }
 
-template<class PoissonProcess, class MarkovKernel, class Intensity, class Flow>
+template<class PoissonProcess, class MarkovKernel, class Flow>
 template<class State>
-IterationResult<State> Pdmp<PoissonProcess, MarkovKernel, Intensity, Flow>
+IterationResult<State> Pdmp<PoissonProcess, MarkovKernel, Flow>
   ::simulateOneIteration(const State& initialState) {
 
   auto iterationTime = getJumpTime(initialState, *this);

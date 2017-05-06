@@ -10,14 +10,12 @@
  */
 
 // Forward declare mock classes.
-struct MockIntensity;
 struct MockPoissonProcess;
 struct MockMarkovKernel;
 struct MockFlow;
 
 // Typedef the dummy Pdmp type to be used for unit testing.
-typedef pdmp::Pdmp<
-          MockPoissonProcess, MockMarkovKernel, MockIntensity, MockFlow>
+typedef pdmp::Pdmp<MockPoissonProcess, MockMarkovKernel, MockFlow>
         DummyPdmp;
 
 struct DummyState {
@@ -44,13 +42,6 @@ struct MockMarkovKernel {
     : dummyMarkovKernelVariable(dummyVariable) {};
   const int dummyMarkovKernelVariable;
   MOCK_METHOD2(jump, DummyState(const DummyState&, const DummyPdmp&));
-};
-
-struct MockIntensity {
-  MockIntensity() : MockIntensity(0) {};
-  MockIntensity(int dummyVariable) : dummyIntensityVariable(dummyVariable) {};
-  int dummyIntensityVariable;
-  MOCK_METHOD1(evaluateIntensityAt, float(const DummyState&));
 };
 
 struct MockFlow {
