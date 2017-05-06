@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include "core/flow/linear_flow.h"
+#include "core/policies/linear_flow.h"
 #include "core/state_space/position_and_velocity_state.h"
 
 /**

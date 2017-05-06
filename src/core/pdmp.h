@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/flow/linear_flow.h"
+#include "core/policies/linear_flow.h"
 
 #include <tuple>
 #include <utility>

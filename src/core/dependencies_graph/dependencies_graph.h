@@ -4,7 +4,7 @@
 #include <set>
 #include <vector>
 
-#include "core/flow/linear_flow.h"
+#include "core/policies/linear_flow.h"
 
 namespace pdmp {
 namespace dependencies_graph {
