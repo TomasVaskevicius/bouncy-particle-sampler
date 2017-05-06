@@ -8,7 +8,6 @@
 
 #include "core/dependencies_graph/nodes.h"
 
-const int kStateSpaceDim = 4;
 
 using DynamicRealVector = Eigen::Matrix<float, Eigen::Dynamic, 1>;
 
@@ -18,6 +17,8 @@ using RealVector = Eigen::Matrix<float, Dim, 1>;
 using pdmp::dependencies_grap::MarkovKernelNode;
 using pdmp::dependencies_grap::FactorNode;
 using namespace testing;
+
+const int kStateSpaceDim = 4;
 
 /**
  * State space implementation for testing.
@@ -54,6 +55,9 @@ bool operator==(const DummyState& lhs, const DummyState& rhs) {
   return lhs.internalVector.isApprox(rhs.internalVector);
 }
 
+const auto dummyLambda = [] (void) -> void {};
+const DummyState dummyState(RealVector<kStateSpaceDim>(0.0f, 0.0f, 0.0f, 0.0f));
+
 TEST(MarkovKernelNodeUnitTests, TestLambdaFunctionIsInvokedCorrectly) {
   // Set up a Markov kernel node.
   const std::vector<int> ids{0,3};
@@ -73,13 +77,14 @@ TEST(MarkovKernelNodeUnitTests, TestLambdaFunctionIsInvokedCorrectly) {
   EXPECT_TRUE(markovKernelNode.jump(initialState) == expectedState);
 }
 
-TEST(FactorNodeTests, TestFactorNodeLambdaCalculationsAreCorrect) {
+TEST(FactorNodeTests, TestIntensityCalculationsAreCorrect) {
   // Set up a factor node.
   const std::vector<int> ids{1,3};
   auto factor = [] (DynamicRealVector vector) -> float {
     return vector.norm();
   };
-  FactorNode<decltype(factor)> factorNode(ids, factor);
+  FactorNode<decltype(dummyLambda), decltype(factor)> factorNode(
+    ids, dummyLambda, factor);
 
   // Set up initial state.
   const RealVector<kStateSpaceDim> initialVector(1.0f, 3.0f, 3.0f, 4.0f);
@@ -89,6 +94,33 @@ TEST(FactorNodeTests, TestFactorNodeLambdaCalculationsAreCorrect) {
 
   EXPECT_TRUE(
     std::abs(factorNode.evaluateIntensity(initialState) - expectedResult)
+    < std::numeric_limits<float>::min());
+}
+
+TEST(FactorNodeTests, TestNoOpIntensityThrowsAnException) {
+  const std::vector<int> ids{};
+  FactorNode<decltype(dummyLambda)> factorNode(ids, dummyLambda);
+
+  EXPECT_THROW(factorNode.evaluateIntensity(dummyState), std::runtime_error);
+}
+
+TEST(FactorNodeTests, TestPoissonProcessLambdaCalculationsAreCorrect) {
+  // Set up the Poisson process calculation lambda.
+  const std::vector<int> ids{0,1};
+  auto poissonProcessLambda = [] (DynamicRealVector vector) -> float{
+    return vector.norm();
+  };
+  FactorNode<decltype(poissonProcessLambda)> factorNode(
+    ids, poissonProcessLambda);
+
+  // Set up initial state.
+  const RealVector<kStateSpaceDim> vector(8.0f, 6.0f, 1.0f, 1.0f);
+  DummyState state(vector);
+
+  const double expectedResult = 10.0f;
+
+  EXPECT_TRUE(
+    std::abs(factorNode.getPoissonProcessResult(state) - expectedResult)
     < std::numeric_limits<float>::min());
 }
 

@@ -58,15 +58,40 @@ struct VariableNode {
 };
 
 /**
+ * A data structure for Poisson process simulation results.
+ */
+struct PoissonProcessResult {
+  PoissonProcessResult(const double& nextTime, const bool& isLowerBound);
+  const double nextTime;
+  const bool isLowerBound;
+};
+
+/**
+ * A default intensity implementation, for cases when we can simulate the
+ * Poisson process directly, with no rejection.
+ */
+struct NoOpIntensity {
+
+  /**
+   * Throws an exception if called.
+   */
+  template<class Input>
+  auto operator()(Input);
+
+};
+
+/**
  * A class for representing nodes associated to intensity factors.
  */
-template<class Lambda>
+template<class PoissonProcessLambda, class IntensityLambda = NoOpIntensity>
 class FactorNode {
 
  public:
 
   FactorNode(
-    const std::vector<int>& dependentVariableIds, const Lambda& lambda);
+    const std::vector<int>& dependentVariableIds,
+    const PoissonProcessLambda& poissonProcessLambda,
+    const IntensityLambda& intensityLambda = NoOpIntensity());
 
   /**
    *  Evaluates the indensity at this given state.
@@ -74,11 +99,19 @@ class FactorNode {
   template<class State>
   auto evaluateIntensity(const State& state);
 
+  /**
+   * Get Poisson process simulation result for a given state.
+   */
+  template<class State>
+  auto getPoissonProcessResult(const State& state);
+
   std::vector<int> dependentVariableIds;
 
  private:
 
-  Lambda lambda_;
+  PoissonProcessLambda poissonProcessLambda_;
+  IntensityLambda intensityLambda_;
+
 };
 
 }

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdexcept>
+
 namespace pdmp {
 namespace dependencies_grap {
 
@@ -24,19 +26,37 @@ VariableNode::VariableNode(const std::vector<int>& dependentFactorIds)
   : dependentFactorIds(dependentFactorIds) {
 }
 
-template<class Lambda>
-FactorNode<Lambda>::FactorNode(
+template<class PoissonProcessLambda, class IntensityLambda>
+FactorNode<PoissonProcessLambda, IntensityLambda>::FactorNode(
   const std::vector<int>& dependentVariableIds,
-  const Lambda& lambda)
+  const PoissonProcessLambda& poissonProcessLambda,
+  const IntensityLambda& intensityLambda)
   : dependentVariableIds(dependentVariableIds),
-    lambda_(lambda) {
+    poissonProcessLambda_(poissonProcessLambda),
+    intensityLambda_(intensityLambda) {
 }
 
-template<class Lambda>
+template<class Input>
+auto NoOpIntensity::operator()(Input) {
+  throw std::runtime_error("Called unimplemented intensity method.");
+}
+
+template<class PoissonProcessLambda, class IntensityLambda>
 template<class State>
-auto FactorNode<Lambda>::evaluateIntensity(const State& state) {
+auto FactorNode<PoissonProcessLambda, IntensityLambda>
+  ::evaluateIntensity(const State& state) {
+
   auto stateSubvector = state.getSubvector(this->dependentVariableIds);
-  return this->lambda_(stateSubvector);
+  return this->intensityLambda_(stateSubvector);
+}
+
+template<class PoissonProcessLambda, class IntensityLambda>
+template<class State>
+auto FactorNode<PoissonProcessLambda, IntensityLambda>
+  ::getPoissonProcessResult(const State& state) {
+
+  auto stateSubvector = state.getSubvector(this->dependentVariableIds);
+  return this->poissonProcessLambda_(stateSubvector);
 }
 
 }
