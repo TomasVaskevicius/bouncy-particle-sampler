@@ -3,7 +3,7 @@
 #include <vector>
 
 namespace pdmp {
-namespace dependencies_grap {
+namespace dependencies_graph {
 
 /**
  * A struct for representing nodes associated to variables.

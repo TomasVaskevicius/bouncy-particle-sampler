@@ -16,8 +16,8 @@ using DynamicRealVector = Eigen::Matrix<float, Eigen::Dynamic, 1>;
 template<int Dim>
 using RealVector = Eigen::Matrix<float, Dim, 1>;
 
-using pdmp::dependencies_grap::MarkovKernelNode;
-using pdmp::dependencies_grap::FactorNode;
+using pdmp::dependencies_graph::MarkovKernelNode;
+using pdmp::dependencies_graph::FactorNode;
 using namespace testing;
 
 const int kStateSpaceDim = 4;
@@ -60,14 +60,14 @@ bool operator==(const DummyState& lhs, const DummyState& rhs) {
 }
 
 namespace pdmp {
-namespace dependencies_grap {
+namespace dependencies_graph {
 struct PoissonProcessResultBase {
   PoissonProcessResultBase(const float& time) : time(time) {}
   float time;
 };
 }
 }
-using pdmp::dependencies_grap::PoissonProcessResultBase;
+using pdmp::dependencies_graph::PoissonProcessResultBase;
 using PoissonProcessResultPtr = std::shared_ptr<PoissonProcessResultBase>;
 
 const auto dummyLambda = [] (auto) -> PoissonProcessResultPtr {};
