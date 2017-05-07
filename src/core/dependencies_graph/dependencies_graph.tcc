@@ -20,7 +20,7 @@ std::vector<int> computeFactorDependencies(int factorId, const Graph& graph) {
 
   // First add all variable ids, that are modified by the current markov kernel.
   auto markovKernelNode = graph.markovKernelNodes[factorId];
-  for (const int& id : markovKernelNode.dependentVariableIds) {
+  for (const int& id : markovKernelNode->dependentVariableIds) {
     variableDependencies.insert(id);
   }
 
@@ -36,7 +36,7 @@ std::vector<int> computeFactorDependencies(int factorId, const Graph& graph) {
   // Now find factors, dependent on variables in variableDependencies set.
   std::set<int> factorDependencies;
   for (const int& id : variableToVariableDependencies) {
-    for (const int& depFactorId : graph.variableNodes[id].dependentFactorIds) {
+    for (const int& depFactorId : graph.variableNodes[id]->dependentFactorIds) {
       factorDependencies.insert(depFactorId);
     }
   }

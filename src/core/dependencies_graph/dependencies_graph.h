@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <memory>
 #include <set>
 #include <vector>
 
@@ -27,9 +28,10 @@ class DependenciesGraph {
 
  public:
 
-  using MarkovKernelNodes = std::array<MarkovKernelNode_t, N>;
-  using VariableNodes = std::array<VariableNode_t, StateSpaceDimension>;
-  using FactorNodes = std::array<FactorNode_t, N>;
+  using MarkovKernelNodes = std::array<std::shared_ptr<MarkovKernelNode_t>, N>;
+  using VariableNodes = std::array<
+    std::shared_ptr<VariableNode_t>, StateSpaceDimension>;
+  using FactorNodes = std::array<std::shared_ptr<FactorNode_t>, N>;
 
   DependenciesGraph(
     const MarkovKernelNodes& markovKernelNodes,

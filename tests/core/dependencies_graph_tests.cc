@@ -1,16 +1,23 @@
 #include <algorithm>
 #include <functional>
+#include <memory>
 
 #include <gtest/gtest.h>
 
 #include "core/dependencies_graph/dependencies_graph.h"
 
+using namespace std;
+
 struct DummyMarkovKernelNode {
-  std::vector<int> dependentVariableIds;
+  DummyMarkovKernelNode(const vector<int>& dependentVariableIds)
+    : dependentVariableIds(dependentVariableIds) {}
+  vector<int> dependentVariableIds;
 };
 
 struct DummyVariableNode {
-  std::vector<int> dependentFactorIds;
+  DummyVariableNode(const vector<int>& dependentFactorIds)
+    : dependentFactorIds(dependentFactorIds) {}
+  vector<int> dependentFactorIds;
 };
 
 struct DummyFactorNode {
@@ -19,7 +26,7 @@ struct DummyFactorNode {
 // Flow with identity as dependencies.
 class DummyFlow1 {
  public:
-  static std::vector<int> getDependentVariableIds(int id, int dim) {
+  static vector<int> getDependentVariableIds(int id, int dim) {
     return {id};
   }
 };
@@ -27,7 +34,7 @@ class DummyFlow1 {
 // Flow with identity and adjacent variable as dependencies.
 class DummyFlow2 {
  public:
-  static std::vector<int> getDependentVariableIds(int id, int dim) {
+  static vector<int> getDependentVariableIds(int id, int dim) {
     return {id, (id + 1) % dim};
   }
 };
@@ -54,14 +61,22 @@ class DependenciesGraphTests : public ::testing::Test {
 
   DependenciesGraphTests()
     : graph_(
-      {DummyMarkovKernelNode{{1}}, // Kernel0
-       DummyMarkovKernelNode{{0, 3}}, // Kernel1
-       DummyMarkovKernelNode{{2}}}, // Kernel2
-      {DummyVariableNode{{0}}, // Variable0
-       DummyVariableNode{{0, 1, 2}}, // Variable1
-       DummyVariableNode{{}}, // Variable2
-       DummyVariableNode{{2}}}, // Variable3
-      {DummyFactorNode(), DummyFactorNode(), DummyFactorNode()}) {
+      {
+        make_shared<DummyMarkovKernelNode>(vector<int>{1}), // Kernel0
+        make_shared<DummyMarkovKernelNode>(vector<int>{0, 3}), // Kernel1
+        make_shared<DummyMarkovKernelNode>(vector<int>{2}) // Kernel2
+      },
+      {
+        make_shared<DummyVariableNode>(vector<int>{0}), // Variable0
+        make_shared<DummyVariableNode>(vector<int>{0, 1, 2}), // Variable1
+        make_shared<DummyVariableNode>(vector<int>{}), // Variable2
+        make_shared<DummyVariableNode>(vector<int>{2}) // Variable3
+      },
+      {
+        make_shared<DummyFactorNode>(),
+        make_shared<DummyFactorNode>(),
+        make_shared<DummyFactorNode>()
+      }) {
   }
 
   DependenciesGraph graph_;
@@ -71,15 +86,15 @@ namespace {
 
 // We will only compare contents of the vectors, and not the order.
 // This is a helper for sorting.
-std::vector<int> sorted(std::vector<int> vector) {
-  std::sort(vector.begin(), vector.end(), std::less<int>());
+vector<int> sorted(vector<int> vector) {
+  sort(vector.begin(), vector.end(), less<int>());
   return vector;
 }
 
 }
 
 TEST_F(DependenciesGraphTests, TestDependenciesAreCalculatedCorrectly) {
-  std::vector<int> expectedDependencies{0, 1, 2};
+  vector<int> expectedDependencies{0, 1, 2};
   for (int i = 0; i < 2; i++) {
     auto dependencies = graph_.getFactorDependencies<DummyFlow1>(0);
     EXPECT_TRUE(sorted(dependencies) == expectedDependencies);
@@ -87,7 +102,7 @@ TEST_F(DependenciesGraphTests, TestDependenciesAreCalculatedCorrectly) {
 }
 
 TEST_F(DependenciesGraphTests, TestDependenciesAreCalculatedCorrectly2) {
-  std::vector<int> expectedDependencies{0, 2};
+  vector<int> expectedDependencies{0, 2};
   for (int i = 0; i < 2; i++) {
     auto dependencies = graph_.getFactorDependencies<DummyFlow1>(1);
     EXPECT_TRUE(sorted(dependencies) == expectedDependencies);
@@ -95,7 +110,7 @@ TEST_F(DependenciesGraphTests, TestDependenciesAreCalculatedCorrectly2) {
 }
 
 TEST_F(DependenciesGraphTests, TestDependenciesAreCalculatedCorrectly3) {
-  std::vector<int> expectedDependencies{};
+  vector<int> expectedDependencies{};
   for (int i = 0; i < 2; i++) {
     auto dependencies = graph_.getFactorDependencies<DummyFlow1>(2);
     EXPECT_TRUE(sorted(dependencies) == expectedDependencies);
@@ -103,7 +118,7 @@ TEST_F(DependenciesGraphTests, TestDependenciesAreCalculatedCorrectly3) {
 }
 
 TEST_F(DependenciesGraphTests, TestDependenciesAreCalculatedCorrectly4) {
-  std::vector<int> expectedDependencies{0, 1, 2};
+  vector<int> expectedDependencies{0, 1, 2};
   for (int i = 0; i < 2; i++) {
     auto dependencies = graph_.getFactorDependencies<DummyFlow2>(0);
     EXPECT_TRUE(sorted(dependencies) == expectedDependencies);
@@ -111,7 +126,7 @@ TEST_F(DependenciesGraphTests, TestDependenciesAreCalculatedCorrectly4) {
 }
 
 TEST_F(DependenciesGraphTests, TestDependenciesAreCalculatedCorrectly5) {
-  std::vector<int> expectedDependencies{0, 1, 2};
+  vector<int> expectedDependencies{0, 1, 2};
   for (int i = 0; i < 2; i++) {
     auto dependencies = graph_.getFactorDependencies<DummyFlow2>(1);
     EXPECT_TRUE(sorted(dependencies) == expectedDependencies);
@@ -119,7 +134,7 @@ TEST_F(DependenciesGraphTests, TestDependenciesAreCalculatedCorrectly5) {
 }
 
 TEST_F(DependenciesGraphTests, TestDependenciesAreCalculatedCorrectly6) {
-  std::vector<int> expectedDependencies{2};
+  vector<int> expectedDependencies{2};
   for (int i = 0; i < 2; i++) {
     auto dependencies = graph_.getFactorDependencies<DummyFlow2>(2);
     EXPECT_TRUE(sorted(dependencies) == expectedDependencies);
