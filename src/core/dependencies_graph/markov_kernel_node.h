@@ -17,7 +17,7 @@ struct MarkovKernelNodeBase {
  * A class for representing nodes associated with Markov kernels.
  */
 template<class State, class Lambda>
-class MarkovKernelNode : MarkovKernelNodeBase<State> {
+class MarkovKernelNode : public MarkovKernelNodeBase<State> {
 
  public:
 
@@ -35,7 +35,7 @@ class MarkovKernelNode : MarkovKernelNodeBase<State> {
   /**
    * Applieds the Markov kernel jump on a given state.
    */
-  virtual State jump(const State& state) final;
+  virtual State jump(const State& state) override final;
 
  private:
 
