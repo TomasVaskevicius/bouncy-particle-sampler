@@ -6,22 +6,9 @@
 
 #include "core/dependencies_graph/dependencies_graph.h"
 
+#include "dummy_nodes.h"
+
 using namespace std;
-
-struct DummyMarkovKernelNode {
-  DummyMarkovKernelNode(const vector<int>& dependentVariableIds)
-    : dependentVariableIds(dependentVariableIds) {}
-  vector<int> dependentVariableIds;
-};
-
-struct DummyVariableNode {
-  DummyVariableNode(const vector<int>& dependentFactorIds)
-    : dependentFactorIds(dependentFactorIds) {}
-  vector<int> dependentFactorIds;
-};
-
-struct DummyFactorNode {
-};
 
 // Flow with identity as dependencies.
 class DummyFlow1 {
