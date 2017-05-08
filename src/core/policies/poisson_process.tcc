@@ -116,6 +116,11 @@ auto PoissonProcess<DependenciesGraph, EventScheduler>::getJumpTime(
 }
 
 template<class DependenciesGraph, template<class> class EventScheduler>
+int PoissonProcess<DependenciesGraph, EventScheduler>::getLastFactorId() const {
+  return this->lastFactorId_;
+}
+
+template<class DependenciesGraph, template<class> class EventScheduler>
 template<class State>
 void PoissonProcess<DependenciesGraph, EventScheduler>
   ::resimulateEventForFactor(

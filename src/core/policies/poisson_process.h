@@ -89,6 +89,8 @@ class PoissonProcess {
   template<class State, class HostClass>
   auto getJumpTime(const State& state, const HostClass& hostClass);
 
+  int getLastFactorId() const;
+
  private:
 
   // Invalidates the last event of the given factor and simulates a new
@@ -106,8 +108,8 @@ class PoissonProcess {
   std::shared_ptr<DependenciesGraph> dependenciesGraph_;
   std::vector<int> factorsToResimulate_;
   std::array<SharedPtrToEvent, kNumberOfFactors> latestEvents_;
-  int lastFactorId_ = 0;
   double currentTime_ = 0.0f;
+  int lastFactorId_ = 0;
 
 };
 
