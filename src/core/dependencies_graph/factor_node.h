@@ -9,7 +9,7 @@ namespace dependencies_graph {
 
 namespace {
 
-auto noOpIntensity = [] (auto) -> double {
+auto noOpIntensity = [] (auto, const auto&) -> double {
   throw std::runtime_error("Called unimplemented intensity method.");
 };
 
@@ -42,6 +42,7 @@ class FactorNode : public FactorNodeBase<State> {
  public:
 
   using RealType = typename FactorNodeBase<State>::RealType;
+  static const int kStateSpaceDim = State::kStateSpaceDim;
 
   FactorNode(
     const std::vector<int>& dependentVariableIds,

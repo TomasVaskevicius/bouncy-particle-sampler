@@ -24,16 +24,14 @@ typename FactorNode<State, PoissonProcessLambda, IntensityLambda>::RealType
 FactorNode<State, PoissonProcessLambda, IntensityLambda>
   ::evaluateIntensity(const State& state) {
 
-  auto stateSubvector = state.getSubvector(this->dependentVariableIds);
-  return this->intensityLambda_(stateSubvector);
+  return this->intensityLambda_(state, *this);
 }
 
 template<class State, class PoissonProcessLambda, class IntensityLambda>
 PoissonProcessResultPtr FactorNode<State, PoissonProcessLambda, IntensityLambda>
   ::getPoissonProcessResult(const State& state) {
 
-  auto stateSubvector = state.getSubvector(this->dependentVariableIds);
-  return this->poissonProcessLambda_(stateSubvector);
+  return this->poissonProcessLambda_(state, *this);
 }
 
 }

@@ -70,7 +70,7 @@ struct PoissonProcessResultBase {
 using pdmp::dependencies_graph::PoissonProcessResultBase;
 using PoissonProcessResultPtr = std::shared_ptr<PoissonProcessResultBase>;
 
-const auto dummyLambda = [] (auto) -> PoissonProcessResultPtr {};
+const auto dummyLambda = [] (auto, const auto&) -> PoissonProcessResultPtr {};
 const DummyState dummyState(RealVector<kStateSpaceDim>(0.0f, 0.0f, 0.0f, 0.0f));
 
 
@@ -97,8 +97,9 @@ TEST(MarkovKernelNodeUnitTests, TestLambdaFunctionIsInvokedCorrectly) {
 TEST(FactorNodeTests, TestIntensityCalculationsAreCorrect) {
   // Set up a factor node.
   const std::vector<int> ids{1,3};
-  auto factor = [] (DynamicRealVector vector) -> float {
-    return vector.norm();
+  auto factor = [] (DummyState vector, const auto& host) -> float {
+    auto subvector = vector.getSubvector(host.dependentVariableIds);
+    return subvector.norm();
   };
   FactorNode<DummyState, decltype(dummyLambda), decltype(factor)> factorNode(
     ids, dummyLambda, factor);
@@ -124,8 +125,9 @@ TEST(FactorNodeTests, TestNoOpIntensityThrowsAnException) {
 TEST(FactorNodeTests, TestPoissonProcessLambdaCalculationsAreCorrect) {
   // Set up the Poisson process calculation lambda.
   const std::vector<int> ids{0,1};
-  auto poissonProcessLambda = [] (DynamicRealVector vector) {
-    return std::make_shared<PoissonProcessResultBase>(vector.norm());
+  auto poissonProcessLambda = [] (DummyState vector, const auto& host) {
+    auto subvector = vector.getSubvector(host.dependentVariableIds);
+    return std::make_shared<PoissonProcessResultBase>(subvector.norm());
   };
   FactorNode<DummyState, decltype(poissonProcessLambda)> factorNode(
     ids, poissonProcessLambda);
