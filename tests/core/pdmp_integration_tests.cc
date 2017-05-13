@@ -150,7 +150,7 @@ TEST(PdmpIntegrationTests, TestSimpleProcessExecutesCorrectly) {
 
   // Set factor0 thinning results.
   EXPECT_CALL(factor0Rng, getUnif01RandomVariable())
-    .Times(5)
+    .Times(4)
     .WillOnce(Return(1.0f)) // Reject the first proposal at time t = 1.
     .WillOnce(Return(0.0f)) // Accept the second proposal at time t = 2.
     .WillOnce(Return(0.0f)) // Would accept (t = 3), but this should be
@@ -162,7 +162,7 @@ TEST(PdmpIntegrationTests, TestSimpleProcessExecutesCorrectly) {
   EXPECT_CALL(factor1Rng, getUnif01RandomVariable())
     .Times(2)
     .WillOnce(Return(exp(-2.5f))) // The first time of factor1 is 2.5.
-    .WillOnce(Return(exp(-1.0f))); // The next proposed time will be 3.5.
+    .WillOnce(Return(exp(-0.9f))); // The next proposed time will be 3.4.
 
   // Kernel0 should be invoked at t = 2, which multiplies position variables
   // by 2.
@@ -194,12 +194,12 @@ TEST(PdmpIntegrationTests, TestSimpleProcessExecutesCorrectly) {
   // Now we test if factor0 time proposed at t = 3 will be correctly
   // invalidated, even though would be accepted.
   State expectedIntermediateState3 =
-    LinearFlow::advanceStateByFlow(secondIterationResult.state, 1.0f);
+    LinearFlow::advanceStateByFlow(secondIterationResult.state, 0.9f);
   State expectedStateAfterThirdIteration =
     expectedIntermediateState3.constructStateWithModifiedVariables(
       std::vector<int>{2, 3}, std::vector<float>{0.5f, 0.5f});
   IterationResult<State> expectedThirdIterationResult(
-    expectedStateAfterThirdIteration, 1.0f);
+    expectedStateAfterThirdIteration, 0.9f);
 
   auto thirdIterationResult = pdmp.simulateOneIteration(
     secondIterationResult.state);

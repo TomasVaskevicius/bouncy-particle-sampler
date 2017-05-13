@@ -102,7 +102,7 @@ auto PoissonProcess<DependenciesGraph, EventScheduler>::getJumpTime(
       double timeDifference = event->result->time - this->currentTime_;
       State rejectedState = hostClass.advanceStateByFlow(state, timeDifference);
       this->resimulateEventForFactor(
-        rejectedState, event->factorId, timeDifference);
+        rejectedState, event->factorId, event->result->time);
       continue;
     }
     // Found an event that is valid and not rejected.
@@ -110,7 +110,7 @@ auto PoissonProcess<DependenciesGraph, EventScheduler>::getJumpTime(
     this->factorsToResimulate_ =
       this->dependenciesGraph_->getFactorDependencies(this->lastFactorId_);
     auto returnTime = event->result->time - this->currentTime_;
-    this->currentTime_ = returnTime;
+    this->currentTime_ = event->result->time;
     return returnTime;
   }
 }
