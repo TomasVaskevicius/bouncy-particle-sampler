@@ -66,9 +66,8 @@ struct PositionAndVelocityState {
   PositionAndVelocityState constructStateWithModifiedVariables(
     std::vector<int> ids, VectorType modification) const;
 
-  const RealVector<Dimension / 2> position;
-  const RealVector<Dimension / 2> velocity;
-
+  RealVector<Dimension / 2> position;
+  RealVector<Dimension / 2> velocity;
 };
 
 /**
