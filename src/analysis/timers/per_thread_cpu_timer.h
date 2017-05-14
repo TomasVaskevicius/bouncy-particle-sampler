@@ -1,0 +1,61 @@
+#pragma once
+
+#include <time.h>
+
+namespace pdmp {
+namespace analysis {
+
+/**
+ * A timer which measures CPU time per thread.
+ *
+ * There are two precodintions:
+ * 1) Should not be used to time algorithms which spawn their own threads.
+ * 2) Your compiler should be using Posix thread model for std::threads
+ *    (For g++, for example, you can check it by typing g++ -v).
+ */
+class PerThreadCpuTimer {
+
+ public:
+
+  /**
+   * A factory method for creating an instance of a timer.
+   */
+  static PerThreadCpuTimer getTimer();
+
+  /**
+   * Starts the timer. Cannot be called two times in a row.
+   */
+  void start();
+
+  /**
+   * Stops the timer.
+   */
+  void stop();
+
+  /**
+   * Resets the timer to 0 and sets it to stopped state.
+   */
+  void reset();
+
+  /**
+   * Returns the currently measured time in milliseconds.
+   */
+  long getTimeInMs();
+
+ private:
+
+  // Should be only created through the factory.
+  // We do this for the purpose of easy testing of classes using the timer,
+  // by simply allowing to mock the timer.
+  PerThreadCpuTimer() = default;
+
+  // A time currently recorded by this timer.
+  timespec currentTime_{0, 0};
+  bool isStarted_{false};
+  timespec lastStart_;
+};
+
+}
+}
+
+#include "per_thread_cpu_timer.tcc"
