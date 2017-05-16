@@ -1,5 +1,5 @@
 #pragma once
-#include <iostream>
+
 #include "gsl_wrappers/wrappers_utils.h"
 
 #include <gsl/gsl_errno.h>
@@ -16,7 +16,7 @@ namespace {
   const double kDefaultEpsabs = 0;
 
   // Default value for the relative error of integration.
-  const double kDefaultEpsrel = 1e-3;
+  const double kDefaultEpsrel = 1e-5;
 }
 
 namespace bps {

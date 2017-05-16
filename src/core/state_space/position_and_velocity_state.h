@@ -32,6 +32,8 @@ struct PositionAndVelocityState {
     Dimension % 2 == 0,
     "StateWithPositionAndVelocity must have dimension divisible by 2.");
 
+  PositionAndVelocityState() = default;
+
   /**
    * A constructor which initialises this state at the given position and
    * velocity.

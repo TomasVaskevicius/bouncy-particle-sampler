@@ -1,35 +1,20 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include <limits>
-
 #include "analysis/output_processors/batch_means.h"
 #include "core/pdmp.h"
 
 #include "../mock_pdmp.h"
+#include "output_processors_tests_utils.h"
 
 using namespace std;
+using namespace myutils;
 using namespace pdmp;
 using namespace pdmp::analysis;
 
-struct State {
-  using RealType = float;
-  float x;
-};
-
-struct MyFlow {
-  static State advanceStateByFlow(State state, float time) {
-    return State{state.x + time};
-  }
-};
-
-using BatchMeansProcessor = BatchMeans<MockPdmp, State, MyFlow>;
+using BatchMeansProcessor = BatchMeans<MockPdmp, State, SimpleFlow>;
 
 auto constIntegrand = [] (State s) -> float { return 1.0f; };
-
-bool areEqual(float lhs, float rhs) {
-  return fabs(lhs - rhs) < 1e-7;
-}
 
 bool testBatchLengths(
   const vector<Batch<float>>& batches,
