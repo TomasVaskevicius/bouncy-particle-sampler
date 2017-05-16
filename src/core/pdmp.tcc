@@ -17,8 +17,7 @@ bool operator==(
   const IterationResult<State>& lhs, const IterationResult<State>& rhs) {
 
   return lhs.state == rhs.state
-         && std::abs(lhs.iterationTime - rhs.iterationTime)
-            < std::numeric_limits<typename State::RealType>::min();
+         && std::abs(lhs.iterationTime - rhs.iterationTime) < 1e-7;
 }
 
 // Constructor for initialising base classes.

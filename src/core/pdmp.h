@@ -34,8 +34,8 @@ template<class State>
 struct IterationResult {
   using RealType = typename State::RealType;
   IterationResult(const State& newState, const RealType& iterationTime);
-  const State state;
-  const RealType iterationTime;
+  State state;
+  RealType iterationTime;
 };
 
 template<class State>
