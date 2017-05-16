@@ -6,3 +6,5 @@ target_link_libraries(timed_runner_tests gtest gmock)
 
 add_test(NAME pdmp_runner_tests COMMAND pdmp_runner_tests)
 add_test(NAME timed_runner_tests COMMAND timed_runner_tests)
+
+add_subdirectory(output_processors)
