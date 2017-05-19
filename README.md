@@ -3,11 +3,12 @@ An implementation of new MCMC algorithm (see https://arxiv.org/abs/1510.02451)
 
 ## Resolving dependencies
 
-Building the project requires having installed the development packages for:
+Building the project requires having installed:
+  * Eigen3 (A linear algebra library - [download](http://eigen.tuxfamily.org/index.php?title=Main_Page) - tested with 3.3.3 version)
   * GSL (GNU Scientific Library)
   * Qt5 (Core, Gui, PrintSupport and Widgets components are needed)
   * CVODES 2.9.0 (Required by the Stan-Math library)
-  * Boost (Required by the Stan-Math library, the latest version is recommended)
+  * Boost (Required by the Stan-Math library, tested with 1.62.0 version)
 
 Resolving dependencies for Ubuntu:
 `sudo apt-get install libgsl-dev qtbase5-dev libboost-all-dev`

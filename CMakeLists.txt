@@ -21,12 +21,14 @@ find_package(Qt5 COMPONENTS Core Gui Widgets PrintSupport REQUIRED)
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
+# Fin Eigen, required for our linear algebra support.
+find_package(Eigen3 REQUIRED)
+
 # Find CVODES and Boost (required by the Stan-Math library).
 find_package(CVODES REQUIRED)
 find_package(Boost REQUIRED)
 
 # Add all project's include directories.
-set(Eigen_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/third_party/eigen_3.3.0)
 set(QCustomPlot_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/third_party/qcustomplot_2.0.0_beta)
 set(StanMath_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/third_party/stan_math)
 include_directories(${PROJECT_SOURCE_DIR}/src)
@@ -35,8 +37,8 @@ include_directories(system ${StanMath_INCLUDE_DIR})
 include_directories(system ${GSL_INCLUDE_DIRS})
 include_directories(system ${Boost_INCLUDE_DIR})
 include_directories(system ${CVODES_INCLUDE_DIR})
-include_directories(system ${Eigen_INCLUDE_DIR})
 include_directories(system ${QCustomPlot_INCLUDE_DIR})
+include_directories(system ${EIGEN3_INCLUDE_DIR})
 
 # Add QCustomPlot source file.
 set(QCustomPlot_SOURCE_FILES ${QCustomPlot_INCLUDE_DIR}/qcustomplot.cpp)
