@@ -75,10 +75,11 @@ bool operator>(
 template<class DependenciesGraph, template<class> class EventScheduler>
 PoissonProcess<DependenciesGraph, EventScheduler>::PoissonProcess(
   std::shared_ptr<DependenciesGraph> dependenciesGraph)
-  : dependenciesGraph_(dependenciesGraph) {
+  : dependenciesGraph_(dependenciesGraph),
+    latestEvents_(dependenciesGraph->factorNodes.size()) {
 
   factorsToResimulate_.clear();
-  for (int i = 0; i < kNumberOfFactors; i++) {
+  for (int i = 0; i < dependenciesGraph_->factorNodes.size(); i++) {
     factorsToResimulate_.push_back(i);
     latestEvents_[i] = dummyEvent;
   }

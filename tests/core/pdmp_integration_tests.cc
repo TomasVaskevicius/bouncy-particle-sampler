@@ -27,15 +27,12 @@ using namespace std;
 using namespace testing;
 
 const int kStateSpaceDim = 4;
-const int kNumberOfFactors = 2;
 using RealType = float;
 using State = PositionAndVelocityState<RealType, kStateSpaceDim>;
 using PtrToMarkovKernelNode = shared_ptr<MarkovKernelNodeBase<State>>;
 using PtrToFactorNode = shared_ptr<FactorNodeBase<State>>;
 using PtrToVariableNode = shared_ptr<VariableNode>;
 using MyDependenciesGraph = DependenciesGraph<
-  kNumberOfFactors,
-  kStateSpaceDim,
   MarkovKernelNodeBase<State>,
   VariableNode,
   FactorNodeBase<State>>;
@@ -49,7 +46,7 @@ struct MockRNG {
 
 namespace {
 
-std::array<PtrToMarkovKernelNode, kNumberOfFactors> setUpMarkovKernelNodes(
+std::vector<PtrToMarkovKernelNode> setUpMarkovKernelNodes(
   MockRNG& mockRng0, MockRNG& mockRng1) {
 
   // Kernel0 multiplied associated variables by 2.
@@ -76,7 +73,7 @@ std::array<PtrToMarkovKernelNode, kNumberOfFactors> setUpMarkovKernelNodes(
   };
 }
 
-std::array<PtrToVariableNode, kStateSpaceDim> setUpVariableNodes() {
+std::vector<PtrToVariableNode> setUpVariableNodes() {
   return {
     make_shared<VariableNode>(vector<int>{0}),
     make_shared<VariableNode>(vector<int>{}),
@@ -85,7 +82,7 @@ std::array<PtrToVariableNode, kStateSpaceDim> setUpVariableNodes() {
   };
 }
 
-std::array<PtrToFactorNode, kNumberOfFactors> setUpFactorNodes(
+std::vector<PtrToFactorNode> setUpFactorNodes(
   MockRNG& mockRng0, MockRNG& mockRng1) {
 
   // Factor0 always returns time 1.0f.

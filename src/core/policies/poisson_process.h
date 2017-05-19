@@ -82,7 +82,6 @@ class PoissonProcess {
 
   using SharedPtrToEvent = std::shared_ptr<PoissonProcessEvent>;
   using FactorNodes = typename DependenciesGraph::FactorNodes;
-  static constexpr int kNumberOfFactors = std::tuple_size<FactorNodes>::value;
 
   PoissonProcess(std::shared_ptr<DependenciesGraph> dependenciesGraph);
 
@@ -107,7 +106,7 @@ class PoissonProcess {
   EventScheduler<SharedPtrToEvent> eventScheduler_;
   std::shared_ptr<DependenciesGraph> dependenciesGraph_;
   std::vector<int> factorsToResimulate_;
-  std::array<SharedPtrToEvent, kNumberOfFactors> latestEvents_;
+  std::vector<SharedPtrToEvent> latestEvents_;
   double currentTime_ = 0.0f;
   int lastFactorId_ = 0;
 

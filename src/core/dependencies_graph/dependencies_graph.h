@@ -1,6 +1,5 @@
 #pragma once
 
-#include <array>
 #include <memory>
 #include <set>
 #include <vector>
@@ -18,20 +17,14 @@ namespace dependencies_graph {
  * denoted by template parameter N.
  * The number of variable nodes must be equal to the state space dimensionality.
  */
-template<
-  int N,
-  int StateSpaceDimension,
-  class MarkovKernelNode_t,
-  class VariableNode_t,
-  class FactorNode_t>
+template<class MarkovKernelNode_t, class VariableNode_t, class FactorNode_t>
 class DependenciesGraph {
 
  public:
 
-  using MarkovKernelNodes = std::array<std::shared_ptr<MarkovKernelNode_t>, N>;
-  using VariableNodes = std::array<
-    std::shared_ptr<VariableNode_t>, StateSpaceDimension>;
-  using FactorNodes = std::array<std::shared_ptr<FactorNode_t>, N>;
+  using MarkovKernelNodes = std::vector<std::shared_ptr<MarkovKernelNode_t>>;
+  using VariableNodes = std::vector<std::shared_ptr<VariableNode_t>>;
+  using FactorNodes = std::vector<std::shared_ptr<FactorNode_t>>;
 
   DependenciesGraph(
     const MarkovKernelNodes& markovKernelNodes,
@@ -65,11 +58,11 @@ class DependenciesGraph {
 
   // A bool array, specifying if factor dependencies for i-th factor
   // were already cached.
-  std::array<bool, N> areFactorDependenciesCached_;
+  std::vector<bool> areFactorDependenciesCached_;
 
   // Once we calculate dependencies for a given factor, we cache the
   // results here.
-  std::array<std::vector<int>, N> factorDependenciesCache_;
+  std::vector<std::vector<int>> factorDependenciesCache_;
 
 };
 

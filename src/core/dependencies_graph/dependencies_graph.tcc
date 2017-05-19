@@ -52,38 +52,32 @@ std::vector<int> computeFactorDependencies(int factorId, const Graph& graph) {
 namespace pdmp {
 namespace dependencies_graph {
 
-template<
-  int N,
-  int StateSpaceDimension,
-  class MarkovKernelNode_t,
-  class VariableNode_t,
-  class FactorNode_t>
-DependenciesGraph<
-  N, StateSpaceDimension, MarkovKernelNode_t, VariableNode_t, FactorNode_t>
+template<class MarkovKernelNode_t, class VariableNode_t, class FactorNode_t>
+DependenciesGraph<MarkovKernelNode_t, VariableNode_t, FactorNode_t>
   ::DependenciesGraph(
     const MarkovKernelNodes& markovKernelNodes,
     const VariableNodes& variableNodes,
     const FactorNodes& factorNodes)
   : markovKernelNodes(markovKernelNodes),
     variableNodes(variableNodes),
-    factorNodes(factorNodes) {
+    factorNodes(factorNodes),
+    areFactorDependenciesCached_(factorNodes.size(), false),
+    factorDependenciesCache_(factorNodes.size(), std::vector<int>()) {
 
-  this->areFactorDependenciesCached_.fill(false);
+  if (factorNodes.size() != markovKernelNodes.size()) {
+    throw std::runtime_error(
+      "Trying to create a dependencies graph with different number of factor "
+      "and Markov kernel nodes.");
+  }
 }
 
-template<
-  int N,
-  int StateSpaceDimension,
-  class MarkovKernelNode_t,
-  class VariableNode_t,
-  class FactorNode_t>
+template<class MarkovKernelNode_t, class VariableNode_t, class FactorNode_t>
 template<class Flow>
 const std::vector<int>&
-DependenciesGraph<
-  N, StateSpaceDimension, MarkovKernelNode_t, VariableNode_t, FactorNode_t>
+DependenciesGraph<MarkovKernelNode_t, VariableNode_t, FactorNode_t>
   ::getFactorDependencies(int factorId) {
 
-  checkFactorIdBounds(factorId, N);
+  checkFactorIdBounds(factorId, factorNodes.size());
   if (!areFactorDependenciesCached_[factorId]) {
     factorDependenciesCache_[factorId] =
       computeFactorDependencies<Flow>(factorId, *this);

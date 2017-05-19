@@ -26,11 +26,7 @@ class DummyFlow2 {
   }
 };
 
-const int kNumberOfFactors = 3;
-const int kStateSpaceDimension = 4;
 using DependenciesGraph = pdmp::dependencies_graph::DependenciesGraph<
-  kNumberOfFactors,
-  kStateSpaceDimension,
   DummyMarkovKernelNode,
   DummyVariableNode,
   DummyFactorNode>;

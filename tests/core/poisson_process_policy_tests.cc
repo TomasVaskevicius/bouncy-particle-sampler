@@ -39,8 +39,6 @@ struct MockFactorNode : FactorNodeBase<State> {
 };
 
 using MyDependenciesGraph = DependenciesGraph<
-  kNumberOfFactors,
-  kDim,
   DummyMarkovKernelNode,
   DummyVariableNode,
   MockFactorNode>;
@@ -72,18 +70,18 @@ class PoissonProcessSimulationTests : public ::testing::Test {
 
   PoissonProcessSimulationTests()
     : graph_(std::make_shared<MyDependenciesGraph>(
-      std::array<shared_ptr<DummyMarkovKernelNode>, kNumberOfFactors>{
+      std::vector<shared_ptr<DummyMarkovKernelNode>>{
         make_shared<DummyMarkovKernelNode>(std::vector<int>{0}), // Kernel0
         make_shared<DummyMarkovKernelNode>(std::vector<int>{2, 3}), // Kernel1
         make_shared<DummyMarkovKernelNode>(std::vector<int>{3}) // Kernel2
       },
-      std::array<shared_ptr<DummyVariableNode>, kDim>{
+      std::vector<shared_ptr<DummyVariableNode>>{
         make_shared<DummyVariableNode>(std::vector<int>{0}), // Variable0
         make_shared<DummyVariableNode>(std::vector<int>{}), // Variable1
         make_shared<DummyVariableNode>(std::vector<int>{1}), // Variable2
         make_shared<DummyVariableNode>(std::vector<int>{1, 2}) // Variable3
       },
-      std::array<shared_ptr<MockFactorNode>, kNumberOfFactors>{
+      std::vector<shared_ptr<MockFactorNode>>{
         make_shared<MockFactorNode>(std::vector<int>{}), // Factor0
         make_shared<MockFactorNode>(std::vector<int>{}), // Factor1
         make_shared<MockFactorNode>(std::vector<int>{}) // Factor2
