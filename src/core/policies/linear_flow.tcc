@@ -1,7 +1,7 @@
 #pragma once
 
 #include <stdexcept>
-
+#include <iostream>
 namespace {
 
 /**
@@ -20,7 +20,7 @@ constexpr void checkStateSpaceDimensionality(int dim) {
 constexpr void checkVariableIdRange(int variableId, int dim) {
   (variableId < 0 || variableId >= dim) ?
     throw std::out_of_range("Variable id is out of range for dependent "
-                            " variables calculation.")
+                            "variables calculation.")
     : 0;
 }
 

@@ -55,6 +55,13 @@ struct DummyState {
   const RealVector<kStateSpaceDim> internalVector;
 };
 
+struct NoOpFlow {
+  template<class State, typename RealType>
+  static State advanceStateByFlow(State state, RealType time) {
+    return state;
+  };
+};
+
 bool operator==(const DummyState& lhs, const DummyState& rhs) {
   return lhs.internalVector.isApprox(rhs.internalVector);
 }
@@ -70,7 +77,7 @@ struct PoissonProcessResultBase {
 using pdmp::dependencies_graph::PoissonProcessResultBase;
 using PoissonProcessResultPtr = std::shared_ptr<PoissonProcessResultBase>;
 
-const auto dummyLambda = [] (auto, const auto&) -> PoissonProcessResultPtr {};
+const auto dummyLambda = [] (auto, const auto&, auto&) -> PoissonProcessResultPtr {};
 const DummyState dummyState(RealVector<kStateSpaceDim>(0.0f, 0.0f, 0.0f, 0.0f));
 
 
@@ -97,12 +104,11 @@ TEST(MarkovKernelNodeUnitTests, TestLambdaFunctionIsInvokedCorrectly) {
 TEST(FactorNodeTests, TestIntensityCalculationsAreCorrect) {
   // Set up a factor node.
   const std::vector<int> ids{1,3};
-  auto factor = [] (DummyState vector, const auto& host) -> float {
-    auto subvector = vector.getSubvector(host.dependentVariableIds);
+  auto factor = [] (auto subvector, const auto& host) -> float {
     return subvector.norm();
   };
-  FactorNode<DummyState, decltype(dummyLambda), decltype(factor)> factorNode(
-    ids, dummyLambda, factor);
+  FactorNode<DummyState, decltype(dummyLambda), NoOpFlow, decltype(factor)>
+    factorNode(ids, dummyLambda, factor);
 
   // Set up initial state.
   const RealVector<kStateSpaceDim> initialVector(1.0f, 3.0f, 3.0f, 4.0f);
@@ -117,7 +123,8 @@ TEST(FactorNodeTests, TestIntensityCalculationsAreCorrect) {
 
 TEST(FactorNodeTests, TestNoOpIntensityThrowsAnException) {
   const std::vector<int> ids{};
-  FactorNode<DummyState, decltype(dummyLambda)> factorNode(ids, dummyLambda);
+  FactorNode<DummyState, decltype(dummyLambda), NoOpFlow>
+    factorNode(ids, dummyLambda);
 
   EXPECT_THROW(factorNode.evaluateIntensity(dummyState), std::runtime_error);
 }
@@ -125,11 +132,10 @@ TEST(FactorNodeTests, TestNoOpIntensityThrowsAnException) {
 TEST(FactorNodeTests, TestPoissonProcessLambdaCalculationsAreCorrect) {
   // Set up the Poisson process calculation lambda.
   const std::vector<int> ids{0,1};
-  auto poissonProcessLambda = [] (DummyState vector, const auto& host) {
-    auto subvector = vector.getSubvector(host.dependentVariableIds);
+  auto poissonProcessLambda = [] (auto subvector, const auto& host, auto&) {
     return std::make_shared<PoissonProcessResultBase>(subvector.norm());
   };
-  FactorNode<DummyState, decltype(poissonProcessLambda)> factorNode(
+  FactorNode<DummyState, decltype(poissonProcessLambda), NoOpFlow> factorNode(
     ids, poissonProcessLambda);
 
   // Set up initial state.

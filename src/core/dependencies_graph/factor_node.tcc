@@ -9,8 +9,9 @@ FactorNodeBase<State>::FactorNodeBase(
   : dependentVariableIds(dependentVariableIds) {
 }
 
-template<class State, class PoissonProcessLambda, class IntensityLambda>
-FactorNode<State, PoissonProcessLambda, IntensityLambda>::FactorNode(
+template<
+  class State, class PoissonProcessLambda, class Flow, class IntensityLambda>
+FactorNode<State, PoissonProcessLambda, Flow, IntensityLambda>::FactorNode(
   const std::vector<int>& dependentVariableIds,
   const PoissonProcessLambda& poissonProcessLambda,
   const IntensityLambda& intensityLambda)
@@ -19,19 +20,25 @@ FactorNode<State, PoissonProcessLambda, IntensityLambda>::FactorNode(
     intensityLambda_(intensityLambda) {
 }
 
-template<class State, class PoissonProcessLambda, class IntensityLambda>
-typename FactorNode<State, PoissonProcessLambda, IntensityLambda>::RealType
-FactorNode<State, PoissonProcessLambda, IntensityLambda>
-  ::evaluateIntensity(const State& state) {
+template<
+  class State, class PoissonProcessLambda, class Flow,  class IntensityLambda>
+typename FactorNode<State, PoissonProcessLambda, Flow, IntensityLambda>
+::RealType FactorNode<State, PoissonProcessLambda, Flow, IntensityLambda>
+  ::evaluateIntensity(const State& state, const RealType& time) {
 
-  return this->intensityLambda_(state, *this);
+  auto advancedState = Flow::advanceStateByFlow(state, time);
+  auto stateSubvector = advancedState.getSubvector(this->dependentVariableIds);
+  return this->intensityLambda_(stateSubvector, *this);
 }
 
-template<class State, class PoissonProcessLambda, class IntensityLambda>
-PoissonProcessResultPtr FactorNode<State, PoissonProcessLambda, IntensityLambda>
+template<
+  class State, class PoissonProcessLambda, class Flow, class IntensityLambda>
+PoissonProcessResultPtr
+FactorNode<State, PoissonProcessLambda, Flow, IntensityLambda>
   ::getPoissonProcessResult(const State& state) {
 
-  return this->poissonProcessLambda_(state, *this);
+  auto stateSubvector = state.getSubvector(this->dependentVariableIds);
+  return this->poissonProcessLambda_(stateSubvector, *this, state);
 }
 
 }

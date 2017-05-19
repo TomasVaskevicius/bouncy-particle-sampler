@@ -34,7 +34,7 @@ using PoissonProcessResultPtr = std::shared_ptr<PoissonProcessResultBase>;
 struct MockFactorNode : FactorNodeBase<State> {
   MockFactorNode(const std::vector<int>& dummyVec)
     : FactorNodeBase<State>(dummyVec) {}
-  MOCK_METHOD1(evaluateIntensity, RealType(const State&));
+  MOCK_METHOD2(evaluateIntensity, RealType(const State&, const float&));
   MOCK_METHOD1(getPoissonProcessResult, PoissonProcessResultPtr(const State&));
 };
 

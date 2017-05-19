@@ -10,13 +10,16 @@ namespace dependencies_graph {
  */
 struct VariableNode {
 
+
+  VariableNode() = default;
+
   /**
    * @dependentFactorIds
    *   The ids of intensity factors, which depend on this variable.
    */
   VariableNode(const std::vector<int>& dependenFactorIds);
 
-  const std::vector<int> dependentFactorIds;
+  std::vector<int> dependentFactorIds;
 };
 
 }

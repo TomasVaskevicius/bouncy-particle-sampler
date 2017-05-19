@@ -4,6 +4,8 @@
 #include <stdexcept>
 #include <vector>
 
+#include "core/policies/linear_flow.h"
+
 namespace pdmp {
 namespace dependencies_graph {
 
@@ -24,7 +26,8 @@ struct FactorNodeBase {
   using RealType = typename State::RealType;
   FactorNodeBase(const std::vector<int>& dependentVariableIds);
   ~FactorNodeBase() = default;
-  virtual RealType evaluateIntensity(const State& state) = 0;
+  virtual RealType evaluateIntensity(
+    const State& state, const RealType& time) = 0;
   virtual PoissonProcessResultPtr getPoissonProcessResult(
     const State& state) = 0;
   const std::vector<int> dependentVariableIds;
@@ -36,6 +39,7 @@ struct FactorNodeBase {
 template<
   class State,
   class PoissonProcessLambda,
+  class Flow = LinearFlow,
   class IntensityLambda = decltype(noOpIntensity)>
 class FactorNode : public FactorNodeBase<State> {
 
@@ -50,9 +54,11 @@ class FactorNode : public FactorNodeBase<State> {
     const IntensityLambda& intensityLambda = noOpIntensity);
 
   /**
-   *  Evaluates the indensity at this given state.
+   *  Evaluates the indensity at this after advancing the state
+   *  by the flow with a specified amount of time.
    */
-  virtual RealType evaluateIntensity(const State& state) override final;
+  virtual RealType evaluateIntensity(
+    const State& state, const RealType& time = 0) override final;
 
   /**
    * Get Poisson process simulation result for a given state.

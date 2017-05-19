@@ -61,9 +61,10 @@ TEST_F(PositionAndVelocityStateTests, TestInvalidStateModification) {
     std::logic_error);
 }
 
-TEST_F(PositionAndVelocityStateTests, TestEmptySubvectorExtractionFails) {
+TEST_F(PositionAndVelocityStateTests, TestEmptySubvectorExtractionWorks) {
   std::vector<int> ids;
-  EXPECT_THROW(state_.getSubvector(ids), std::logic_error);
+  auto subvector = state_.getSubvector(ids);
+  EXPECT_TRUE(subvector.size() == 0);
 }
 
 TEST_F(PositionAndVelocityStateTests, TestTooBigSubvectorExtractionFails) {

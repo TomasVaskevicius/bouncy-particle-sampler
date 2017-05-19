@@ -87,22 +87,21 @@ std::vector<PtrToFactorNode> setUpFactorNodes(
 
   // Factor0 always returns time 1.0f.
   // We control rejection step by controlling the mockRng0.
-  auto factor0In = [] (const State& state, const auto& host) {
-    auto subvector = state.getSubvector(host.dependentVariableIds);
+  auto factor0In = [] (const auto& subvector, const auto& host) {
     // Just return some number in [0, 1].
     if (subvector.norm() > 1.0f) {
       return 1.0f / subvector.norm();
     }
     return subvector.norm();
   };
-  auto factor0Pp = [&mockRng0] (const State& state, auto& host) {
-    auto subvector = state.getSubvector(host.dependentVariableIds);
+  auto factor0Pp =
+    [&mockRng0] (const auto& subvector, auto& host, auto& fullState) {
+
     auto time = 1.0f;
     float unif = mockRng0.getUnif01RandomVariable();
     auto thinningStep =
-      [time, state, &host, unif] () {
-        State stateAtProposal = LinearFlow::advanceStateByFlow(state, time);
-        auto realIntensity = host.evaluateIntensity(stateAtProposal);
+      [time, &host, unif, fullState] () {
+        auto realIntensity = host.evaluateIntensity(fullState, time);
         bool shouldAccept = unif < realIntensity;
         return shouldAccept;
     };
@@ -112,7 +111,9 @@ std::vector<PtrToFactorNode> setUpFactorNodes(
   vector<int> factor0Ids{0};
 
   // Factor1. This is simply an exp(1) inhomogeneous Poisson process factor.
-  auto factor1Pp = [&mockRng1] (const State& state, const auto& host) {
+  auto factor1Pp =
+    [&mockRng1] (const auto& subvector, const auto& host, auto&) {
+
     return make_shared<PoissonProcessResult<>>(
       (-1.0f) * log(mockRng1.getUnif01RandomVariable()));
   };
@@ -121,7 +122,7 @@ std::vector<PtrToFactorNode> setUpFactorNodes(
   // Factor0 depends on Factor1
   // Factor1 depends only on itself.
   return {
-    make_shared<FactorNode<State, decltype(factor0Pp), decltype(factor0In)>>(
+    make_shared<FactorNode<State, decltype(factor0Pp), LinearFlow, decltype(factor0In)>>(
       factor0Ids, factor0Pp, factor0In),
     make_shared<FactorNode<State, decltype(factor1Pp)>>(
       factor1Ids, factor1Pp)

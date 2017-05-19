@@ -37,8 +37,8 @@ T PositionAndVelocityState<T, Dim>::getElementAtIndex(int index) const {
 template<typename T, int Dim>
 typename PositionAndVelocityState<T, Dim>::DynamicRealVector
 PositionAndVelocityState<T, Dim>::getSubvector(std::vector<int> ids) const {
-  if (ids.size() <= 0 || ids.size() > Dim) {
-    throw std::out_of_range("Subvector size needs to be between 1 and " +
+  if (ids.size() < 0 || ids.size() > Dim) {
+    throw std::out_of_range("Subvector size needs to be between 0 and " +
                             std::to_string(Dim) + ".");
   }
 
