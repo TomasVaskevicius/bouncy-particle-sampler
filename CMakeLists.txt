@@ -43,6 +43,10 @@ include_directories(system ${EIGEN3_INCLUDE_DIR})
 # Add QCustomPlot source file.
 set(QCustomPlot_SOURCE_FILES ${QCustomPlot_INCLUDE_DIR}/qcustomplot.cpp)
 
+# Add plotting utils source files.
+set(PlottingUtils_SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/analysis/plotting/piecewise_linear_path.cc
+                               ${PROJECT_SOURCE_DIR}/src/analysis/plotting/utils.cc)
+
 # Create a variable for holding all necessary link libraries.
 set(BPS_LINK_LIBRARIES ${CVODES_LIBRARIES}
                        ${GSL_LIBRARIES}
