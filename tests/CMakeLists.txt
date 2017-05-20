@@ -26,3 +26,4 @@ add_subdirectory(${CMAKE_BINARY_DIR}/googletest-src
 
 add_subdirectory(core)
 add_subdirectory(analysis)
+add_subdirectory(mcmc)
