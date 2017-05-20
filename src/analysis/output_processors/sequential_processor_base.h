@@ -6,7 +6,7 @@ namespace pdmp {
 namespace analysis {
 
 template<class Pdmp, class State>
-class SequentialProcessorBase : ObserverBase<Pdmp, State> {
+class SequentialProcessorBase : public ObserverBase<Pdmp, State> {
 
  public:
 
