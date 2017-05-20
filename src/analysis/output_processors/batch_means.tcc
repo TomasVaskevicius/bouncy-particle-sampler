@@ -53,9 +53,11 @@ auto BatchMeans<Pdmp, State, Flow>::estimateAsymptoticVariance(
       continue;
     }
     numberOfTerms++;
-    asymptoticVariance +=
-      (batch.value / sqrt(batch.trajectoryLength))
-      - (knownMean * sqrt(batch.trajectoryLength));
+    // The following term by CLT has mean 0 and variance equal to the
+    // asymptotic variance.
+    auto term = (batch.value / sqrt(batch.trajectoryLength))
+                - (knownMean * sqrt(batch.trajectoryLength));
+    asymptoticVariance += term * term;
   }
   return asymptoticVariance / (numberOfTerms - 1);
 }
