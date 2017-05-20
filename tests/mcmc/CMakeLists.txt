@@ -4,4 +4,4 @@ target_link_libraries(utils_tests gtest gmock)
 add_test(NAME utils_tests COMMAND utils_tests)
 
 add_subdirectory(distributions)
-
+add_subdirectory(bps)

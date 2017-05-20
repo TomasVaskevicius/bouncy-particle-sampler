@@ -1,0 +1,4 @@
+add_executable(reflection_kernel_tests reflection_kernel_tests.cc)
+target_link_libraries(reflection_kernel_tests gtest gmock)
+
+add_test(NAME reflection_kernel_tests COMMAND reflection_kernel_tests)
