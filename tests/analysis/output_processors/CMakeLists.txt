@@ -7,6 +7,10 @@ target_link_libraries(mean_estimators_tests gtest gmock ${GSL_LIBRARIES})
 add_executable(autocorrelation_calculator_tests autocorrelation_calculator_tests.cc)
 target_link_libraries(autocorrelation_calculator_tests gtest gmock ${GSL_LIBRARIES})
 
+add_executable(path_collector_tests path_collector_tests.cc)
+target_link_libraries(path_collector_tests gtest gmock)
+
 add_test(NAME batch_means_tests COMMAND batch_means_tests)
 add_test(NAME mean_estimators_tests COMMAND mean_estimators_tests)
 add_test(NAME autocorrelation_calculator_tests COMMAND autocorrelation_calculator_tests)
+add_test(NAME path_collector_tests COMMAND path_collector_tests)
