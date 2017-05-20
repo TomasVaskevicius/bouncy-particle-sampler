@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/random_number_sampler.h"
+#include "random_number_sampler.h"
 
 #include <random>
 
