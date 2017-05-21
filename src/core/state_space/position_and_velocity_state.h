@@ -72,6 +72,9 @@ struct PositionAndVelocityState {
   RealVector<Dimension / 2> velocity;
 };
 
+template<typename RealType>
+using DynamicPositionAndVelocityState = PositionAndVelocityState<RealType, -2>;
+
 /**
  * The comparison function for states of the above type.
  */

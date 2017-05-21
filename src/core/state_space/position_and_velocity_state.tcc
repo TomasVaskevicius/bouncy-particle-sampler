@@ -21,25 +21,27 @@ bool operator==(
 
 template<typename T, int Dim>
 T PositionAndVelocityState<T, Dim>::getElementAtIndex(int index) const {
-  if (index < 0 || index >= Dim) {
+  int dimension = this->position.size() * 2;
+  if (index < 0 || index >= dimension) {
     throw std::out_of_range("Element index " + std::to_string(index) + " is"
                             " out of range. Should be 0 <= index < " +
-                            std::to_string(Dim) + ".");
+                            std::to_string(dimension) + ".");
   }
 
-  if (index < Dim / 2) {
+  if (index < dimension / 2) {
     return this->position(index);
   } else {
-    return this->velocity(index - Dim / 2);
+    return this->velocity(index - dimension / 2);
   }
 }
 
 template<typename T, int Dim>
 typename PositionAndVelocityState<T, Dim>::DynamicRealVector
 PositionAndVelocityState<T, Dim>::getSubvector(std::vector<int> ids) const {
-  if (ids.size() < 0 || ids.size() > Dim) {
+  int dimension = this->position.size() * 2;
+  if (ids.size() < 0 || ids.size() > dimension) {
     throw std::out_of_range("Subvector size needs to be between 0 and " +
-                            std::to_string(Dim) + ".");
+                            std::to_string(dimension) + ".");
   }
 
   DynamicRealVector subVector(ids.size());
@@ -61,13 +63,14 @@ PositionAndVelocityState<T, Dim>::constructStateWithModifiedVariables(
                            "to the modification vector size.");
   }
 
+  int dimension = this->position.size() * 2;
   RealVector<Dim / 2> newPosition = this->position;
   RealVector<Dim / 2> newVelocity = this->velocity;
   for (int i = 0; i < ids.size(); i++) {
-    if (ids[i] < Dim / 2) {
+    if (ids[i] < dimension / 2) {
       newPosition(ids[i]) = modification[i];
     } else {
-      newVelocity(ids[i] - Dim / 2) = modification[i];
+      newVelocity(ids[i] - dimension / 2) = modification[i];
     }
   }
   return PositionAndVelocityState<T, Dim>(newPosition, newVelocity);
