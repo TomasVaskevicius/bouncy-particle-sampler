@@ -41,6 +41,14 @@ class PoissonProcessResult : public PoissonProcessResultBase {
 };
 
 /**
+ * A helper for easily creating a PoissonProcessResultBase pointer.
+ */
+template<class Lambda = decltype(accept)>
+std::shared_ptr<PoissonProcessResultBase> wrapPoissonProcessResult(
+  double time, const Lambda& lambda = accept);
+
+
+/**
  * Struct for inserting into the event queue.
  */
 struct PoissonProcessEvent {

@@ -39,6 +39,15 @@ std::shared_ptr<PoissonProcessResultBase> PoissonProcessResult<Lambda>
     this->time + timeToAdd, this->shouldAccept_);
 }
 
+template<class Lambda>
+std::shared_ptr<PoissonProcessResultBase> wrapPoissonProcessResult(
+  double time, const Lambda& lambda) {
+
+  std::shared_ptr<PoissonProcessResultBase> result = std::make_shared<
+    PoissonProcessResult<decltype(lambda)>>(time, lambda);
+  return result;
+}
+
 PoissonProcessEvent::PoissonProcessEvent(
   const int& factorId,
   std::shared_ptr<PoissonProcessResultBase> result)
