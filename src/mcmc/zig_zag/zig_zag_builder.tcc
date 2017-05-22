@@ -104,16 +104,16 @@ static std::vector<int> getVelocityVariables(
 }
 
 ZigZagBuilder::ZigZagBuilder(int numberOfModelVariables)
-  : PdmpBuilderBase<bps::State, bps::Flow>(numberOfModelVariables * 2),
+  : PdmpBuilderBase<zig_zag::State, zig_zag::Flow>(numberOfModelVariables * 2),
     numberOfModelVariables_(numberOfModelVariables) {
 
   // Add extra switching rates for each dimensional component.
   for (int i = 0; i < numberOfModelVariables; i++) {
     auto indepFlippingStrategy = getIndependentFlippingStrategy(
       1.0 / numberOfModelVariables);
-    PdmpBuilderBase<bps::State, bps::Flow>::addFactorNode(
+    PdmpBuilderBase<zig_zag::State, zig_zag::Flow>::addFactorNode(
       std::vector<int>{}, indepFlippingStrategy);
-    PdmpBuilderBase<bps::State, bps::Flow>::addMarkovKernelNode(
+    PdmpBuilderBase<zig_zag::State, zig_zag::Flow>::addMarkovKernelNode(
       std::vector<int>{i + numberOfModelVariables},
       std::vector<int>{i + numberOfModelVariables},
       flipPredeterminedVariable);
@@ -144,9 +144,9 @@ void ZigZagBuilder::addFactor(
   auto poissonProcessStrategy = distribution.template getPoissonProcessStrategy<
     zig_zag::Flow>();
 
-  PdmpBuilderBase<bps::State, bps::Flow>::addFactorNode(
+  PdmpBuilderBase<zig_zag::State, zig_zag::Flow>::addFactorNode(
     variablesNeededByFactorNode, poissonProcessStrategy);
-  PdmpBuilderBase<bps::State, bps::Flow>::addMarkovKernelNode(
+  PdmpBuilderBase<zig_zag::State, zig_zag::Flow>::addMarkovKernelNode(
     variablesNeededByFlipKernel,
     variablesToBeChangedByFlipKernel,
     flipKernel);
@@ -154,7 +154,7 @@ void ZigZagBuilder::addFactor(
 }
 
 auto ZigZagBuilder::build() {
-  return PdmpBuilderBase<bps::State, bps::Flow>::build();
+  return PdmpBuilderBase<zig_zag::State, zig_zag::Flow>::build();
 }
 
 }

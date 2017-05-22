@@ -3,12 +3,10 @@
 
 #include <Eigen/Core>
 
-#include "mcmc/bps/bps_builder.h"
+#include "mcmc/zig_zag/zig_zag_builder.h"
 #include "mcmc/distributions/gaussian.h"
 
 #include "run_and_plot.h"
-
-const double kRefreshRate = 1.0;
 
 using namespace pdmp::mcmc;
 
@@ -21,15 +19,15 @@ int main(int argc, char **argv) {
   mean << 0, 0;
   mcmc::GaussianDistribution gaussianDistribution(mean, covariances);
 
-  // Create a BPS sampler from the factor created above.
-  pdmp::mcmc::BpsBuilder bpsBuilder(2);
-  bpsBuilder.addFactor(
+  // Create a Zig-Zag sampler from the factor created above.
+  pdmp::mcmc::ZigZagBuilder zigZagBuilder(2);
+  zigZagBuilder.addFactor(
     {0,1},
-    gaussianDistribution,
-    kRefreshRate);
-  auto pdmp = bpsBuilder.build();
+    gaussianDistribution);
+  auto pdmp = zigZagBuilder.build();
 
   // Finally, run the sampler and plot its path.
   runSamplerAndPlotPath(pdmp);
   return 0;
 }
+
