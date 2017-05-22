@@ -45,7 +45,7 @@ auto getRefreshmentKernel() {
 namespace {
 
 // In addition to the model variables (position) add the velocity variables,
-std::vector<int> getPositionAndVelocityVariables(
+static std::vector<int> getPositionAndVelocityVariables(
   const std::vector<int>& positionVariableIds, int modelDimension) {
 
   std::vector<int> allVariables = positionVariableIds;
@@ -57,7 +57,7 @@ std::vector<int> getPositionAndVelocityVariables(
 
 // Return the vector with velocity variable ids for the given position
 // variables.
-std::vector<int> getVelocityVariables(
+static std::vector<int> getVelocityVariables(
   const std::vector<int>& positionVariableIds, int modelDimension) {
 
   std::vector<int> velocityVariables;
