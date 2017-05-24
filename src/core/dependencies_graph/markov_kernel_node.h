@@ -1,5 +1,6 @@
 #pragma once
 
+#include <type_traits>
 #include <vector>
 
 namespace pdmp {
@@ -10,6 +11,7 @@ struct MarkovKernelNodeBase {
   MarkovKernelNodeBase(const std::vector<int>& dependentVariableIds);
   ~MarkovKernelNodeBase() = default;
   virtual State jump(const State& state) = 0;
+  virtual std::decay_t<State> jump(State&& state) = 0;
   const std::vector<int> dependentVariableIds;
 };
 
@@ -53,9 +55,14 @@ class MarkovKernelNode : public MarkovKernelNodeBase<State> {
     const std::vector<int>& requiredVariableIdsForAccess);
 
   /**
-   * Applieds the Markov kernel jump on a given state.
+   * Applies the Markov kernel jump on a given state.
    */
   virtual State jump(const State& state) override final;
+
+  /**
+   * Applies the Markov kernel jump on a given state.
+   */
+  virtual std::decay_t<State> jump(State&& state) override final;
 
  private:
 

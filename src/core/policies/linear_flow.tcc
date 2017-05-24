@@ -1,7 +1,8 @@
 #pragma once
 
 #include <stdexcept>
-#include <iostream>
+#include <type_traits>
+
 namespace {
 
 /**
@@ -24,15 +25,24 @@ constexpr void checkVariableIdRange(int variableId, int dim) {
     : 0;
 }
 
+
+
 }
 
 namespace pdmp {
 
 template<class State, typename RealType>
-State LinearFlow::advanceStateByFlow(State state, RealType time) {
-  auto position = state.position;
-  auto velocity = state.velocity;
-  return State(position + velocity * time, velocity);
+std::decay_t<State> LinearFlow
+  ::advanceStateByFlow(State&& state, RealType time) {
+
+  using State_t = std::decay_t<State>;
+  if (std::is_rvalue_reference<decltype(state)>::value) {
+    return State_t(
+      std::move(state.position + state.velocity * time),
+      std::move(state.velocity));
+  } else {
+    return State_t(state.position + state.velocity * time, state.velocity);
+  }
 }
 
 std::vector<int> LinearFlow::getDependentVariableIds(int variableId, int dim) {

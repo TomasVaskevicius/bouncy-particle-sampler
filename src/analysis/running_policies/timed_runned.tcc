@@ -1,11 +1,14 @@
 #pragma once
 
+#include <type_traits>
+#include <utility>
+
 namespace {
 
 // Runs the given pdmp for a specified amount of time.
 // Returns the last state.
 template<class Timer, class Pdmp, class State>
-State burnIn(
+auto burnIn(
   Pdmp& pdmp,
   const State& initialState,
   long burnInTime) {
@@ -14,7 +17,7 @@ State burnIn(
   State lastState = initialState;
   while (timer.getTimeInMs() < burnInTime) {
     timer.start();
-    auto iterationResult = pdmp.simulateOneIteration(lastState);
+    auto iterationResult = pdmp.simulateOneIteration(std::move(lastState));
     lastState = iterationResult.state;
     timer.stop();
   }
@@ -31,18 +34,21 @@ template<class PdmpRunner, class Pdmp, class State>
 void TimedRunner<Timer>::run(
   PdmpRunner& pdmpRunnerHost,
   Pdmp& pdmp,
-  const State& initialState,
+  State&& initialState,
   long runningTime,
   long burnInTime,
   bool excludeObserverTimes) {
 
-  State lastState = burnIn<Timer, Pdmp, State>(pdmp, initialState, burnInTime);
+  using State_t = std::decay_t<State>;
+
+  State_t lastState = burnIn<Timer, Pdmp, State_t>(
+    pdmp, std::forward<State>(initialState), burnInTime);
   static_cast<PdmpRunner*>(this)->signalProcessBegins(pdmp, lastState);
 
   decltype(auto) timer = Timer::getTimer();
   while (timer.getTimeInMs() < runningTime) {
     timer.start();
-    auto iterationResult = pdmp.simulateOneIteration(lastState);
+    auto iterationResult = pdmp.simulateOneIteration(std::move(lastState));
     lastState = iterationResult.state;
     if (excludeObserverTimes) {
       timer.stop();

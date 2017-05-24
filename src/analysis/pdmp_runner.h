@@ -49,6 +49,13 @@ class PdmpRunner : public RunningPolicy {
   void run(Pdmp& pdmp, const State& initialState, Args&&... args);
 
   /**
+   * Runs the given pdmp at the starting state according to the
+   * runner policy. All args... are forwarded to the running policy.
+   */
+  template<class... Args>
+  void run(Pdmp& pdmp, State&& initialState, Args&&... args);
+
+  /**
    * Registers a given observer to the process.
    */
   void registerAnObserver(ObserverPtr observer);

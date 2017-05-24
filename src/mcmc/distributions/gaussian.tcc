@@ -12,9 +12,9 @@
 namespace {
 
 double transformedInnerProduct(
-  Eigen::Matrix<double, Eigen::Dynamic, 1> x,
-  Eigen::Matrix<double, Eigen::Dynamic, 1> y,
-  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> precisionMatrix) {
+  const Eigen::Matrix<double, Eigen::Dynamic, 1>& x,
+  const Eigen::Matrix<double, Eigen::Dynamic, 1>& y,
+  const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& precisionMatrix) {
 
   return x.transpose() * precisionMatrix * y;
 }
@@ -32,7 +32,7 @@ GaussianDistribution::GaussianDistribution(
 
 auto GaussianDistribution::getLogPdf() const {
   auto logPdf =
-    [mean = mean_, precisionMatrix = precisionMatrix_] (auto x) {
+    [mean = mean_, precisionMatrix = precisionMatrix_] (const auto& x) {
       return stan::math::multi_normal_prec_lpdf<true>(x, mean, precisionMatrix);
     };
   return logPdf;

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <type_traits>
 #include <vector>
 
 namespace pdmp {
@@ -16,7 +17,7 @@ class LinearFlow {
    * (position + velocity * t, velocity).
    */
   template<class State, typename RealType>
-  static State advanceStateByFlow(State state, RealType time);
+  static std::decay_t<State> advanceStateByFlow(State&& state, RealType time);
 
   /**
    * Returns variables, dependent on a given variable id for a given state

@@ -18,7 +18,7 @@ auto getRefreshmentStrategy(double refreshRate) {
   using RealVector = Eigen::Matrix<double, Eigen::Dynamic, 1>;
   auto rng = getRng();
   auto refreshmentStrategy =
-    [rng, refreshRate] (const auto& state, const auto&, const auto&) mutable {
+    [rng, refreshRate] (const auto&, const auto&, const auto&) mutable {
       return dependencies_graph::wrapPoissonProcessResult(
         stan::math::exponential_rng(refreshRate, rng));
     };

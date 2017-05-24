@@ -1,5 +1,6 @@
 #pragma once
 
+#include <type_traits>
 #include <limits>
 
 namespace pdmp {
@@ -7,8 +8,16 @@ namespace pdmp {
 template<class State>
 IterationResult<State>::IterationResult(
   const State& newState,
-  const RealType& iterationTime)
+  RealType iterationTime)
     : state(newState),
+      iterationTime(iterationTime) {
+}
+
+template<class State>
+IterationResult<State>::IterationResult(
+  State&& newState,
+  RealType iterationTime)
+    : state(std::move(newState)),
       iterationTime(iterationTime) {
 }
 
@@ -52,13 +61,16 @@ Pdmp<PoissonProcess, MarkovKernel, Flow>::Pdmp(
 
 template<class PoissonProcess, class MarkovKernel, class Flow>
 template<class State>
-IterationResult<State> Pdmp<PoissonProcess, MarkovKernel, Flow>
-  ::simulateOneIteration(const State& initialState) {
+IterationResult<std::decay_t<State>> Pdmp<PoissonProcess, MarkovKernel, Flow>
+  ::simulateOneIteration(State&& initialState) {
 
+  using State_t = std::decay_t<State>;
   auto iterationTime = getJumpTime(initialState, *this);
-  State stateBeforeJump = advanceStateByFlow(initialState, iterationTime);
-  State stateAfterJump = jump(stateBeforeJump, *this);
-  return IterationResult<State>(stateAfterJump, iterationTime);
+  State_t stateBeforeJump = advanceStateByFlow(
+    std::forward<State>(initialState), iterationTime);
+  State_t stateAfterJump = jump(std::move(stateBeforeJump), *this);
+  return IterationResult<State_t>(
+    std::move(stateAfterJump), iterationTime);
 }
 
 }

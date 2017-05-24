@@ -33,7 +33,8 @@ struct TupleIndexSequences {
 template<class State>
 struct IterationResult {
   using RealType = typename State::RealType;
-  IterationResult(const State& newState, const RealType& iterationTime);
+  IterationResult(const State& newState, RealType iterationTime);
+  IterationResult(State&& newState, RealType iterationTime);
   State state;
   RealType iterationTime;
 };
@@ -100,7 +101,8 @@ class Pdmp :
    *   information.
    */
   template<class State>
-  IterationResult<State> simulateOneIteration(const State& initialState);
+  IterationResult<std::decay_t<State>> simulateOneIteration(
+    State&& initialState);
 
  private:
 

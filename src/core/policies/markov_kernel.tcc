@@ -13,10 +13,17 @@ MarkovKernel<DependenciesGraph>::MarkovKernel
 template<class DependenciesGraph>
 template<class State, class HostClass>
 State MarkovKernel<DependenciesGraph>::jump(
-  const State& state, const HostClass& hostClass) {
+  State&& state, const HostClass& hostClass) {
 
-  int factorId = hostClass.getLastFactorId();
-  return markovKernels_[factorId]->jump(state);
+  this->lastFactorId_ = hostClass.getLastFactorId();
+  return markovKernels_[this->lastFactorId_]->jump(std::forward<State>(state));
+}
+
+template<class DependenciesGraph>
+std::vector<int> MarkovKernel<DependenciesGraph>
+  ::getLastModifiedVariables() const {
+
+  return markovKernels_[this->lastFactorId_]->dependentVariableIds;
 }
 
 }

@@ -6,8 +6,16 @@ namespace pdmp {
 
 template<typename T, int Dim>
 PositionAndVelocityState<T, Dim>::PositionAndVelocityState(
-  RealVector<Dim / 2>  position, RealVector<Dim / 2> velocity)
+  const RealVector<Dim / 2>&  position,
+  const RealVector<Dim / 2>& velocity)
   : position(position), velocity(velocity) {
+}
+
+template<typename T, int Dim>
+PositionAndVelocityState<T, Dim>::PositionAndVelocityState(
+  RealVector<Dim / 2>&&  position,
+  RealVector<Dim / 2>&& velocity)
+  : position(std::move(position)), velocity(std::move(velocity)) {
 }
 
 template<typename T, int Dim>
@@ -37,7 +45,7 @@ T PositionAndVelocityState<T, Dim>::getElementAtIndex(int index) const {
 
 template<typename T, int Dim>
 typename PositionAndVelocityState<T, Dim>::DynamicRealVector
-PositionAndVelocityState<T, Dim>::getSubvector(std::vector<int> ids) const {
+PositionAndVelocityState<T, Dim>::getSubvector(const std::vector<int>& ids) const {
   int dimension = this->position.size() * 2;
   if (ids.size() < 0 || ids.size() > dimension) {
     throw std::out_of_range("Subvector size needs to be between 0 and " +
@@ -54,9 +62,8 @@ PositionAndVelocityState<T, Dim>::getSubvector(std::vector<int> ids) const {
 
 template<typename T, int Dim>
 template<class VectorType>
-PositionAndVelocityState<T, Dim>
-PositionAndVelocityState<T, Dim>::constructStateWithModifiedVariables(
-  std::vector<int> ids, VectorType modification) const {
+void PositionAndVelocityState<T, Dim>::modifyStateInPlace(
+  const std::vector<int>& ids, const VectorType& modification) {
 
   if (ids.size() != modification.size()) {
     throw std::logic_error("The number of ids to be modified should be equal "
@@ -64,16 +71,24 @@ PositionAndVelocityState<T, Dim>::constructStateWithModifiedVariables(
   }
 
   int dimension = this->position.size() * 2;
-  RealVector<Dim / 2> newPosition = this->position;
-  RealVector<Dim / 2> newVelocity = this->velocity;
   for (int i = 0; i < ids.size(); i++) {
     if (ids[i] < dimension / 2) {
-      newPosition(ids[i]) = modification[i];
+      this->position(ids[i]) = modification[i];
     } else {
-      newVelocity(ids[i] - dimension / 2) = modification[i];
+      this->velocity(ids[i] - dimension / 2) = modification[i];
     }
   }
-  return PositionAndVelocityState<T, Dim>(newPosition, newVelocity);
+}
+
+template<typename T, int Dim>
+template<class VectorType>
+PositionAndVelocityState<T, Dim>
+PositionAndVelocityState<T, Dim>::constructStateWithModifiedVariables(
+  const std::vector<int>& ids, const VectorType& modification) const {
+
+  PositionAndVelocityState<T, Dim> copiedState(this->position, this->velocity);
+  copiedState.modifyStateInPlace(ids, modification);
+  return copiedState;
 }
 
 }

@@ -32,7 +32,7 @@ class TimedRunner {
   void run(
     PdmpRunner& pdmpRunnerHost,
     Pdmp& pdmp,
-    const State& initialState,
+    State&& initialState,
     long runningTime,
     long burnInTime = 0,
     bool excludeObserverTimes = true);

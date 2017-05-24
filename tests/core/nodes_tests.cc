@@ -52,7 +52,17 @@ struct DummyState {
     return DummyState(internalVectorCopy);
   }
 
-  const RealVector<kStateSpaceDim> internalVector;
+
+  template<class VectorType>
+  void modifyStateInPlace(
+    const std::vector<int>& ids, VectorType modification) {
+
+    for (int i = 0; i < ids.size(); i++) {
+      this->internalVector[ids[i]] = modification[i];
+    }
+  }
+
+  RealVector<kStateSpaceDim> internalVector;
 };
 
 struct NoOpFlow {

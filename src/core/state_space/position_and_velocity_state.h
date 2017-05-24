@@ -39,7 +39,16 @@ struct PositionAndVelocityState {
    * velocity.
    */
   PositionAndVelocityState(
-    RealVector<Dimension / 2> position, RealVector<Dimension / 2> velocity);
+    const RealVector<Dimension / 2>& position,
+    const RealVector<Dimension / 2>& velocity);
+
+  /**
+   * A constructor which initialises this state at the given position and
+   * velocity.
+   */
+  PositionAndVelocityState(
+    RealVector<Dimension / 2>&& position,
+    RealVector<Dimension / 2>&& velocity);
 
   /**
    * Returns an element of the state at a given index.
@@ -51,7 +60,19 @@ struct PositionAndVelocityState {
   /**
    * Returns a subvector of this state for the given indices vector.
    */
-  DynamicRealVector getSubvector(std::vector<int> ids) const;
+  DynamicRealVector getSubvector(const std::vector<int>& ids) const;
+
+  /**
+   * Modifies the current state with the given vector at the given ids.
+   *
+   * @ids
+   *   Positions of the current state, which should be modified.
+   * @modification
+   *   Modifications, for the specified positions.
+   */
+  template<class VectorType>
+  void modifyStateInPlace(
+    const std::vector<int>& ids, const VectorType& modification);
 
   /**
    * Constructs a new state, by modifying current states positions in
@@ -66,7 +87,7 @@ struct PositionAndVelocityState {
    */
   template<class VectorType>
   PositionAndVelocityState constructStateWithModifiedVariables(
-    std::vector<int> ids, VectorType modification) const;
+    const std::vector<int>& ids, const VectorType& modification) const;
 
   RealVector<Dimension / 2> position;
   RealVector<Dimension / 2> velocity;

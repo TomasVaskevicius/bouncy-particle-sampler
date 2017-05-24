@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 
 namespace pdmp {
 namespace dependencies_graph {
@@ -22,12 +23,17 @@ class MarkovKernel {
    * and invokes appropriate Markov kernel.
    */
   template<class State, class HostClass>
-  State jump(const State& state, const HostClass& hostClass);
+  State jump(State&& state, const HostClass& hostClass);
+
+  /**
+   * Returns ids of variables that were modified by the last jump.
+   */
+  std::vector<int> getLastModifiedVariables() const;
 
  private:
 
   const MarkovKernels& markovKernels_;
-
+  int lastFactorId_;
 };
 
 }

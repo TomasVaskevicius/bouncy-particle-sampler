@@ -28,10 +28,23 @@ MarkovKernelNode<State, Lambda>::MarkovKernelNode(
 
 template<class State, class Lambda>
 State MarkovKernelNode<State, Lambda>::jump(const State& state) {
+
   auto stateSubvector = state.getSubvector(this->requiredVariableIdsForAccess_);
   auto modifiedSubvector = this->lambda_(stateSubvector);
   return state.constructStateWithModifiedVariables(
     this->requiredVariableIdsForAccess_, modifiedSubvector);
+}
+
+template<class State, class Lambda>
+std::decay_t<State> MarkovKernelNode<State, Lambda>::jump(State&& state) {
+
+  using State_t = std::decay_t<State>;
+  auto stateSubvector = state.getSubvector(this->requiredVariableIdsForAccess_);
+  auto modifiedSubvector = this->lambda_(stateSubvector);
+  State_t newState = std::forward<State>(state);
+  newState.modifyStateInPlace(
+    this->requiredVariableIdsForAccess_, modifiedSubvector);
+  return newState;
 }
 
 }

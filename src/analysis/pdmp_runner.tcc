@@ -28,6 +28,18 @@ void PdmpRunner<Pdmp, State, RunningPolicy>::run(
 }
 
 template<class Pdmp, class State, class RunningPolicy>
+template<class... Args>
+void PdmpRunner<Pdmp, State, RunningPolicy>::run(
+  Pdmp& pdmp, State&& initialState, Args&&... args) {
+
+  RunningPolicy::run(
+    *this,
+    pdmp,
+    std::forward<State>(initialState),
+    std::forward<Args>(args)...);
+}
+
+template<class Pdmp, class State, class RunningPolicy>
 void PdmpRunner<Pdmp, State, RunningPolicy>
   ::registerAnObserver(ObserverPtr observer) {
 

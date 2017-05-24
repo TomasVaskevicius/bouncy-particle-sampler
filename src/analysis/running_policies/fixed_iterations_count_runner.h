@@ -26,7 +26,7 @@ class FixedIterationsCountRunner {
   void run(
     PdmpRunner& pdmpRunnerHost,
     Pdmp& pdmp,
-    const State& initialState,
+    State&& initialState,
     long numberOfIterations);
 };
 

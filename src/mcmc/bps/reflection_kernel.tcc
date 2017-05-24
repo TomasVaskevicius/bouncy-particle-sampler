@@ -10,7 +10,7 @@ namespace mcmc {
 template <class F>
 auto getReflectionKernel(const F& logProbGradient) {
   using RealVector = Eigen::Matrix<double, Eigen::Dynamic, 1>;
-  auto kernel = [logProbGradient] (auto stateVector) {
+  auto kernel = [logProbGradient] (auto&& stateVector) {
     if (stateVector.size() % 2 != 0) {
       throw std::runtime_error(
         "The BPS reflection kernel was invoked on a vector of odd size.");
