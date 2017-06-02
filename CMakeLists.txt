@@ -28,6 +28,9 @@ find_package(Eigen3 REQUIRED)
 find_package(CVODES REQUIRED)
 find_package(Boost REQUIRED)
 
+# Find gflags for handling the command line flags in examples.
+find_package(gflags REQUIRED)
+
 # Add all project's include directories.
 set(QCustomPlot_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/third_party/qcustomplot_2.0.0_beta)
 set(StanMath_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/third_party/stan_math)
@@ -39,6 +42,7 @@ include_directories(system ${Boost_INCLUDE_DIR})
 include_directories(system ${CVODES_INCLUDE_DIR})
 include_directories(system ${QCustomPlot_INCLUDE_DIR})
 include_directories(system ${EIGEN3_INCLUDE_DIR})
+include_directories(system ${GFLAGS_INCLUDE_DIR})
 
 # Add QCustomPlot source file.
 set(QCustomPlot_SOURCE_FILES ${QCustomPlot_INCLUDE_DIR}/qcustomplot.cpp)
@@ -51,6 +55,7 @@ set(PlottingUtils_SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/analysis/plotting/piece
 # Create a variable for holding all necessary link libraries.
 set(BPS_LINK_LIBRARIES ${CVODES_LIBRARIES}
                        ${GSL_LIBRARIES}
+                       gflags
                        Qt5::Widgets
                        Qt5::PrintSupport
                        Qt5::Gui
