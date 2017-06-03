@@ -2,6 +2,8 @@
 
 #include <time.h>
 
+#include "clock_gettime_wrapper_base.h"
+
 namespace pdmp {
 namespace analysis {
 
@@ -13,7 +15,7 @@ namespace analysis {
  * 2) Your compiler should be using Posix thread model for std::threads
  *    (For g++, for example, you can check it by typing g++ -v).
  */
-class PerThreadCpuTimer {
+class PerThreadCpuTimer : public ClockGettimeWrapperBase {
 
  public:
 
@@ -22,25 +24,7 @@ class PerThreadCpuTimer {
    */
   static PerThreadCpuTimer getTimer();
 
-  /**
-   * Starts the timer. Cannot be called two times in a row.
-   */
-  void start();
-
-  /**
-   * Stops the timer.
-   */
-  void stop();
-
-  /**
-   * Resets the timer to 0 and sets it to stopped state.
-   */
-  void reset();
-
-  /**
-   * Returns the currently measured time in milliseconds.
-   */
-  long getTimeInMs();
+  virtual timespec getTime() override final;
 
  private:
 
@@ -48,11 +32,6 @@ class PerThreadCpuTimer {
   // We do this for the purpose of easy testing of classes using the timer,
   // by simply allowing to mock the timer.
   PerThreadCpuTimer() = default;
-
-  // A time currently recorded by this timer.
-  timespec currentTime_{0, 0};
-  bool isStarted_{false};
-  timespec lastStart_;
 };
 
 }
