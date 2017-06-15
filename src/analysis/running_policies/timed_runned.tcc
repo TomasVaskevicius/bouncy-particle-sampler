@@ -18,7 +18,7 @@ auto burnIn(
   while (timer.getTimeInMs() < burnInTime) {
     timer.start();
     auto iterationResult = pdmp.simulateOneIteration(std::move(lastState));
-    lastState = iterationResult.state;
+    lastState = std::move(iterationResult.state);
     timer.stop();
   }
   return lastState;
@@ -49,7 +49,6 @@ void TimedRunner<Timer>::run(
   while (timer.getTimeInMs() < runningTime) {
     timer.start();
     auto iterationResult = pdmp.simulateOneIteration(std::move(lastState));
-    lastState = iterationResult.state;
     if (excludeObserverTimes) {
       timer.stop();
       static_cast<PdmpRunner*>(this)->signalIterationResult(iterationResult);
@@ -57,6 +56,7 @@ void TimedRunner<Timer>::run(
       static_cast<PdmpRunner*>(this)->signalIterationResult(iterationResult);
       timer.stop();
     }
+    lastState = std::move(iterationResult.state);
   }
 
   static_cast<PdmpRunner*>(this)->signalProcessEnded();
