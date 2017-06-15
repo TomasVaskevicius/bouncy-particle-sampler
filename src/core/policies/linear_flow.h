@@ -5,6 +5,11 @@
 
 namespace pdmp {
 
+template<class T>
+constexpr bool isRvalueReference() {
+  return std::is_rvalue_reference<T>::value;
+}
+
 /**
  * A class for representing constant velocity flow.
  */
