@@ -3,14 +3,13 @@
 #include <type_traits>
 #include <vector>
 
-#include "core/policies/linear_flow_base.h"
-
 namespace pdmp {
 
 /**
  * A class for representing constant velocity flow.
  */
-class LinearFlow : public LinearFlowBase<LinearFlow> {
+template <class Derived>
+class LinearFlowBase {
 
  public:
 
@@ -21,8 +20,15 @@ class LinearFlow : public LinearFlowBase<LinearFlow> {
   template<class State, typename RealType>
   static std::decay_t<State> advanceStateByFlow(State&& state, RealType time);
 
+  /**
+   * Returns variables, dependent on a given variable id for a given state
+   * space dimensionality. In particular, position variables depend on
+   * associated velocity variables.
+   */
+  static std::vector<int> getDependentVariableIds(int variableId, int dim);
+
 };
 
 }
 
-#include "linear_flow.tcc"
+#include "linear_flow_base.tcc"
